@@ -1,8 +1,13 @@
 <?php
 // Search.php
-// Searches the EXISTING rooms table and uses the EXISTING bookings
-// table only to check whether a room is already booked.
+// Searches the EXISTING rooms table.
 // No new rooms, no sample data - everything is read from the database.
+
+// Start the session BEFORE any HTML is printed.
+// header.php needs the session, and PHP cannot start it after output has begun.
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 include "dbconnection.php";   // provides the existing $conn connection
 
@@ -10,68 +15,11 @@ include "dbconnection.php";   // provides the existing $conn connection
    1. READ THE SEARCH VALUES SENT BY THE FORM (GET)
    index.php and this page both send these values
    ============================================================ */
-$location   = isset($_GET['location'])   ? trim($_GET['location'])   : "";
-$checkin    = isset($_GET['checkin'])    ? trim($_GET['checkin'])    : "";
-$checkout   = isset($_GET['checkout'])   ? trim($_GET['checkout'])   : "";
-$guests     = isset($_GET['guests'])     ? (int) $_GET['guests']     : 0;
-$start_time = isset($_GET['start_time']) ? trim($_GET['start_time']) : "";
-$end_time   = isset($_GET['end_time'])   ? trim($_GET['end_time'])   : "";
-
-// If the user gave a check-in date but no check-out date,
-// we only check that one day.
-if ($checkout == "") {
-    $checkout = $checkin;
-}
+$location = isset($_GET['location']) ? trim($_GET['location']) : "";
+$guests   = isset($_GET['guests'])   ? (int) $_GET['guests']   : 0;
 
 /* ============================================================
-   2. FUNCTION: IS THIS ROOM ALREADY BOOKED?
-   Uses the existing bookings table.
-   A booking conflicts when:
-       booking_date is between the requested dates
-   AND existing start_time < requested end_time
-   AND existing end_time   > requested start_time
-   Example conflict:  existing 10:00-12:00, requested 11:00-13:00
-   Example no conflict: existing 10:00-12:00, requested 12:00-14:00
-   ============================================================ */
-function isRoomBooked($conn, $room_id, $checkin, $checkout, $start_time, $end_time)
-{
-    // No date chosen -> do not block the room, only rooms.status is used
-    if ($checkin == "") {
-        return false;
-    }
-
-    // If no time was chosen, the room is needed for the whole day
-    if ($start_time == "") {
-        $start_time = "00:00:00";
-    }
-    if ($end_time == "") {
-        $end_time = "23:59:59";
-    }
-
-    // Only ACTIVE booking_status values block a room.
-    // This project uses 'confirmed' (see UserProfile.php),
-    // 'pending' is also treated as active. Adjust if needed.
-    $sql = "SELECT booking_id
-            FROM bookings
-            WHERE room_id = ?
-              AND booking_status IN ('pending', 'confirmed')
-              AND booking_date >= ?
-              AND booking_date <= ?
-              AND start_time < ?
-              AND end_time > ?";
-
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("issss", $room_id, $checkin, $checkout, $end_time, $start_time);
-    $stmt->execute();
-    $bookings = $stmt->get_result();
-    $stmt->close();
-
-    // If at least one overlapping booking exists -> room is booked
-    return ($bookings->num_rows > 0);
-}
-
-/* ============================================================
-   3. SEARCH THE EXISTING rooms TABLE
+   2. SEARCH THE EXISTING rooms TABLE
    Prepared statements are used because the user typed the values.
    ============================================================ */
 $sql = "SELECT room_id, room_name, room_type, capacity, location, description, image, status
@@ -153,15 +101,33 @@ body {
 /* ---------- Room result cards (same card look as index/userProfile) ---------- */
 .room-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(4, 1fr);   /* 4 cards in each row */
     gap: 20px;
 }
 
+/* The whole card is a link to Room_Information_Booking.php */
+.room-link,
+.room-link:hover {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
 .room-card {
+    height: 100%;
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
-    padding: 20px;
+    padding: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* Hover: the card lifts a little and gets a blue border */
+.room-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-color: #0d6efd;
 }
 
 /* Room image (top of the card) */
@@ -170,7 +136,7 @@ body {
     height: 180px;
     object-fit: cover;
     border-radius: 6px;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 /* Shown when a room has no image or the file is missing */
@@ -181,6 +147,14 @@ body {
     background: #e9ecef;
     color: #6c757d;
     font-size: 13px;
+}
+
+.room-name,
+.room-type,
+.room-info {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .room-name {
@@ -201,10 +175,17 @@ body {
     margin-bottom: 4px;
 }
 
+/* Description always uses the same space (3 lines), long text is cut with "..." */
 .room-desc {
     font-size: 13px;
+    line-height: 20px;
+    height: 60px;
     color: #777;
     margin: 10px 0;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
 }
 
 /* Availability badge */
@@ -214,7 +195,6 @@ body {
     font-size: 12px;
     padding: 4px 10px;
     border-radius: 12px;
-    margin-bottom: 10px;
 }
 
 .badge-available {
@@ -297,45 +277,21 @@ body.dark-mode footer {
 
             <div class="row g-3 align-items-end">
 
-                <div class="col-md-3">
+                <div class="col-md-7">
                     <label for="location">Room name / type / location</label>
                     <input type="text" class="form-control" id="location" name="location"
                            placeholder="e.g. Kathmandu, Lab, Meeting"
                            value="<?php echo htmlspecialchars($location); ?>">
                 </div>
 
-                <div class="col-md-2">
-                    <label for="checkin">Check-in</label>
-                    <input type="date" class="form-control" id="checkin" name="checkin"
-                           value="<?php echo htmlspecialchars($checkin); ?>">
-                </div>
-
-                <div class="col-md-2">
-                    <label for="checkout">Check-out</label>
-                    <input type="date" class="form-control" id="checkout" name="checkout"
-                           value="<?php echo htmlspecialchars($checkout); ?>">
-                </div>
-
-                <div class="col-md-2">
-                    <label for="start_time">Start time</label>
-                    <input type="time" class="form-control" id="start_time" name="start_time"
-                           value="<?php echo htmlspecialchars($start_time); ?>">
-                </div>
-
-                <div class="col-md-1">
-                    <label for="end_time">End time</label>
-                    <input type="time" class="form-control" id="end_time" name="end_time"
-                           value="<?php echo htmlspecialchars($end_time); ?>">
-                </div>
-
-                <div class="col-md-1">
+                <div class="col-md-3">
                     <label for="guests">Guests</label>
                     <input type="number" class="form-control" id="guests" name="guests"
                            min="1" placeholder="1"
                            value="<?php echo $guests > 0 ? $guests : ""; ?>">
                 </div>
 
-                <div class="col-md-1">
+                <div class="col-md-2">
                     <button type="submit" class="btn btn-primary w-100">Search</button>
                 </div>
 
@@ -355,78 +311,83 @@ body.dark-mode footer {
 
         <div class="room-grid">
 
+            <?php $room_number = 0; ?>
+
             <?php while ($room = $rooms->fetch_assoc()) { ?>
 
                 <?php
-                // 1. rooms.status must allow the room
-                //    (adjust the value below to match your real status values,
-                //     e.g. 'Available' if your table stores it with a capital A)
-                $roomOpen = (strtolower($room['status']) == 'available');
+                $room_number++;
 
-                // 2. bookings table must not have an overlapping booking
-                $booked = isRoomBooked($conn, $room['room_id'],
-                                       $checkin, $checkout,
-                                       $start_time, $end_time);
+                // Only the first 8 rooms are visible at the start.
+                // The other rooms are hidden until "Show More" is clicked.
+                $hidden_style = "";
+                if ($room_number > 8) {
+                    $hidden_style = 'style="display:none;"';
+                }
 
-                // Room is only available when BOTH checks pass
-                $available = ($roomOpen && !$booked);
+                // The room is available when rooms.status is "Available"
+                $available = (strtolower($room['status']) == 'available');
 
                 // The room image is shown only if the image column has a filename
                 // AND that file really exists inside the images folder
                 $hasImage = (!empty($room['image']) && file_exists("images/" . $room['image']));
                 ?>
 
-                <div class="room-card">
+                <!-- The whole card is one link to the room information page -->
+                <a href="Room_Information_Booking.php?room_id=<?php echo (int) $room['room_id']; ?>"
+                   class="room-link" <?php echo $hidden_style; ?>>
 
-                    <?php if ($hasImage) { ?>
-                        <img src="images/<?php echo htmlspecialchars($room['image']); ?>"
-                             alt="<?php echo htmlspecialchars($room['room_name']); ?>"
-                             class="room-image">
-                    <?php } else { ?>
-                        <div class="room-image no-image">No Image Available</div>
-                    <?php } ?>
+                    <div class="room-card">
 
-                    <div class="room-name">
-                        <?php echo htmlspecialchars($room['room_name']); ?>
+                        <?php if ($hasImage) { ?>
+                            <img src="images/<?php echo htmlspecialchars($room['image']); ?>"
+                                 alt="<?php echo htmlspecialchars($room['room_name']); ?>"
+                                 class="room-image">
+                        <?php } else { ?>
+                            <div class="room-image no-image">No Image Available</div>
+                        <?php } ?>
+
+                        <div class="room-name">
+                            <?php echo htmlspecialchars($room['room_name']); ?>
+                        </div>
+
+                        <div class="room-type">
+                            <?php echo htmlspecialchars($room['room_type']); ?>
+                        </div>
+
+                        <div class="room-info">
+                            Capacity: <?php echo (int) $room['capacity']; ?> person(s)
+                        </div>
+
+                        <div class="room-info">
+                            Location: <?php echo htmlspecialchars($room['location']); ?>
+                        </div>
+
+                        <div class="room-desc">
+                            <?php echo htmlspecialchars($room['description']); ?>
+                        </div>
+
+                        <?php if ($available) { ?>
+                            <span class="badge-available">Available</span>
+                        <?php } else { ?>
+                            <span class="badge-unavailable">Unavailable</span>
+                        <?php } ?>
+
                     </div>
 
-                    <div class="room-type">
-                        <?php echo htmlspecialchars($room['room_type']); ?>
-                    </div>
-
-                    <div class="room-info">
-                        Capacity: <?php echo (int) $room['capacity']; ?> person(s)
-                    </div>
-
-                    <div class="room-info">
-                        Location: <?php echo htmlspecialchars($room['location']); ?>
-                    </div>
-
-                    <div class="room-desc">
-                        <?php echo htmlspecialchars($room['description']); ?>
-                    </div>
-
-                    <?php if ($available) { ?>
-                        <span class="badge-available">Available</span>
-                        <br>
-                        <!-- Point this to your existing booking page -->
-                        <a href="booking.php?room_id=<?php echo (int) $room['room_id']; ?>"
-                           class="btn btn-primary btn-sm">
-                            Book Room
-                        </a>
-                    <?php } else { ?>
-                        <span class="badge-unavailable">Unavailable</span>
-                        <br>
-                        <button class="btn btn-secondary btn-sm" disabled>
-                            Booked
-                        </button>
-                    <?php } ?>
-
-                </div>
+                </a>
 
             <?php } ?>
 
         </div>
+
+        <?php if ($rooms->num_rows > 8) { ?>
+            <div class="text-center mt-4">
+                <button type="button" class="btn btn-primary" id="showMoreBtn" onclick="showMoreRooms();">
+                    Show More
+                </button>
+            </div>
+        <?php } ?>
 
     <?php } else { ?>
 
@@ -443,6 +404,30 @@ body.dark-mode footer {
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* "Show More" - shows 8 more rooms each time the button is clicked */
+
+// The first 8 rooms are already visible (PHP hides the rest)
+let visibleRooms = 8;
+
+function showMoreRooms() {
+    // Every room card is inside a link with the class "room-link"
+    let rooms = document.querySelectorAll(".room-link");
+
+    // Show the next 8 rooms
+    for (let i = visibleRooms; i < visibleRooms + 8 && i < rooms.length; i++) {
+        rooms[i].style.display = "block";
+    }
+
+    visibleRooms += 8;
+
+    // All rooms are visible now -> hide the button
+    if (visibleRooms >= rooms.length) {
+        document.getElementById("showMoreBtn").style.display = "none";
+    }
+}
+</script>
 
 </body>
 </html>
