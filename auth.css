@@ -1,0 +1,239 @@
+/* =========================================================
+   auth.css - design for login.php and register.php
+   ========================================================= */
+
+/* Background */
+/* To change the background, replace images/room-background.jpg */
+body {
+    font-family: Arial, sans-serif;
+    color: #111827;
+    background-image: url("images/room-background.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Logo (top left) */
+.logo {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px 6px 8px;
+    background: rgba(255, 255, 255, 0.75);
+    border-radius: 14px;
+    text-decoration: none;
+    color: #111827;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.logo img {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+}
+
+/* Page container: centers the card on the screen */
+.login-container {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 15px 30px;
+    overflow: hidden;
+}
+
+/* Thin circles behind the card */
+.login-container::before,
+.login-container::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+}
+
+.login-container::before {
+    width: 760px;
+    height: 760px;
+}
+
+.login-container::after {
+    width: 1000px;
+    height: 1000px;
+}
+
+/* Main Card */
+.login-box {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 400px;
+    padding: 32px 30px 26px;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 24px;
+    background: linear-gradient(180deg, #d8f0ff 0%, #ffffff 48%);
+    box-shadow: 0 12px 40px rgba(30, 60, 100, 0.18);
+}
+
+/* Small icon box at the top of the card */
+.card-icon {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.login-box h1 {
+    margin: 0 0 6px;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.login-box .subtitle {
+    margin: 0 auto 22px;
+    max-width: 280px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #6b7280;
+}
+
+/* Error / success messages (the PHP still creates them) */
+.login-box .alert {
+    padding: 10px 14px;
+    font-size: 13px;
+    border-radius: 10px;
+}
+
+/* Input Fields */
+.form-group {
+    margin-bottom: 12px;
+}
+
+.input-box {
+    position: relative;
+}
+
+.input-box .field-icon {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%);
+    font-size: 15px;
+    color: #6b7280;
+}
+
+.input-box input {
+    width: 100%;
+    height: 44px;
+    padding: 0 42px 0 40px;
+    font-size: 14px;
+    color: #111827;
+    background: #f1f3f5;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    outline: none;
+}
+
+.input-box input::placeholder {
+    color: #9ca3af;
+}
+
+.input-box input:focus {
+    background: #ffffff;
+    border-color: #0d6efd;
+}
+
+/* Password Icon (show / hide) */
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    padding: 4px 8px;
+    font-size: 16px;
+    color: #4b5563;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.toggle-password:hover {
+    color: #111827;
+}
+
+/* Forgot password link */
+.forgot-link {
+    margin: -4px 0 14px;
+    text-align: right;
+    font-size: 13px;
+}
+
+.forgot-link a {
+    color: #111827;
+}
+
+/* Buttons */
+.login-button {
+    width: 100%;
+    height: 44px;
+    margin-top: 6px;
+    font-size: 14px;
+    color: #ffffff;
+    background: linear-gradient(180deg, #3b3f47 0%, #14171c 100%);
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background: linear-gradient(180deg, #4a4f58 0%, #1f2329 100%);
+}
+
+/* Link under the button (Register / Login) */
+.switch-text {
+    margin: 22px 0 0;
+    padding-top: 16px;
+    text-align: center;
+    font-size: 13px;
+    color: #6b7280;
+    border-top: 1px dashed #cbd5e1;
+}
+
+.switch-text a {
+    color: #111827;
+    font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+    .logo {
+        top: 14px;
+        left: 14px;
+    }
+
+    .login-container {
+        padding-top: 70px;
+    }
+
+    .login-box {
+        padding: 26px 20px 22px;
+        border-radius: 20px;
+    }
+}
