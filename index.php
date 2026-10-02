@@ -629,7 +629,9 @@ body.dark-mode .search-bar-card .form-control::placeholder {
             </div>
         </div>
 
-        <a href="register.php" class="btn-outline-blue">Sign up for newsletter</a>
+        <?php if (!isset($_SESSION['user_id'])) { ?>
+            <a href="register.php" class="btn-outline-blue">Sign up for newsletter</a>
+        <?php } ?>
 
     </div>
 

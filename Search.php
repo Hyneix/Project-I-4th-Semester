@@ -297,7 +297,7 @@ body.dark-mode .no-results {
                 <div class="col-12 col-md-7">
                     <label for="location">Room name / type / location</label>
                     <input type="text" class="form-control" id="location" name="location"
-                           placeholder="e.g. Kathmandu, Lab, Meeting"
+                           placeholder="e.g. Kathmandu, Deluxe, Family"
                            value="<?php echo htmlspecialchars($location); ?>">
                 </div>
 

@@ -27,21 +27,36 @@ $account_created = date("m/d/Y", strtotime($user['created_at']));
 $stmt->close();
 
 
-/* Profile picture upload */
+/* Profile picture upload (JPG or PNG, max 2 MB) */
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['profile_pic'])) {
 
     $upload_folder = "uploads/";
 
     if (!is_dir($upload_folder)) {
-        mkdir($upload_folder, 0777, true);
+        mkdir($upload_folder, 0755, true);
     }
 
-    $file = $upload_folder . "user_" . $user_id . ".jpg";
+    $tmp_file = $_FILES['profile_pic']['tmp_name'];
+    $image_info = false;
 
-    if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $file)) {
-        $upload_msg = "Photo updated!";
-    } else {
+    if ($_FILES['profile_pic']['error'] == 0) {
+        $image_info = @getimagesize($tmp_file);   // false if it is not a real image
+    }
+
+    if ($_FILES['profile_pic']['error'] != 0) {
         $upload_msg = "Upload failed.";
+    } elseif ($_FILES['profile_pic']['size'] > 2 * 1024 * 1024) {
+        $upload_msg = "Photo must be smaller than 2 MB.";
+    } elseif ($image_info === false || !in_array($image_info['mime'], ["image/jpeg", "image/png"])) {
+        $upload_msg = "Please choose a JPG or PNG image.";
+    } else {
+        $file = $upload_folder . "user_" . $user_id . ".jpg";
+
+        if (move_uploaded_file($tmp_file, $file)) {
+            $upload_msg = "Photo updated!";
+        } else {
+            $upload_msg = "Upload failed.";
+        }
     }
 }
 
@@ -50,12 +65,14 @@ $has_profile_pic = file_exists($profile_pic);
 
 
 /* Upcoming bookings */
-$sql = "SELECT purpose, room_id, booking_date
-        FROM bookings
-        WHERE user_id = ?
-        AND booking_date >= CURDATE()
-        AND booking_status = 'confirmed'
-        ORDER BY booking_date ASC, start_time ASC
+$sql = "SELECT r.room_name, b.booking_status,
+               COALESCE(b.check_in_date, b.booking_date) AS stay_date
+        FROM bookings b
+        JOIN rooms r ON r.room_id = b.room_id
+        WHERE b.user_id = ?
+        AND COALESCE(b.check_in_date, b.booking_date) >= CURDATE()
+        AND b.booking_status IN ('Pending', 'Approved')
+        ORDER BY stay_date ASC
         LIMIT 4";
 
 $stmt = $conn->prepare($sql);
@@ -68,11 +85,14 @@ $stmt->close();
 
 
 /* Booking history */
-$sql = "SELECT purpose, room_id, booking_date
-        FROM bookings
-        WHERE user_id = ?
-        AND booking_date < CURDATE()
-        ORDER BY booking_date DESC
+$sql = "SELECT r.room_name, b.booking_status,
+               COALESCE(b.check_in_date, b.booking_date) AS stay_date
+        FROM bookings b
+        JOIN rooms r ON r.room_id = b.room_id
+        WHERE b.user_id = ?
+        AND (COALESCE(b.check_in_date, b.booking_date) < CURDATE()
+             OR b.booking_status = 'Cancelled')
+        ORDER BY stay_date DESC
         LIMIT 5";
 
 $stmt2 = $conn->prepare($sql);
@@ -131,7 +151,7 @@ function timeAgo($date)
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>User Profile - QuickRoom</title>
+    <title>User Profile - Room Booking System</title>
 
     <!-- Same Bootstrap version as index.php -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -487,6 +507,7 @@ function timeAgo($date)
 
                     <h6 class="card-title">
                         Upcoming bookings
+                        <a href="my_bookings.php" class="float-end small">View all</a>
                     </h6>
 
                     <?php if ($upcoming_result->num_rows > 0) { ?>
@@ -494,15 +515,11 @@ function timeAgo($date)
                         <?php while ($row = $upcoming_result->fetch_assoc()) { ?>
 
                             <?php
-                            if (!empty($row['purpose'])) {
-                                $display_name = $row['purpose'];
-                            } else {
-                                $display_name = "Room #" . $row['room_id'];
-                            }
+                            $display_name = $row['room_name'];
 
                             $date = date(
                                 "M j",
-                                strtotime($row['booking_date'])
+                                strtotime($row['stay_date'])
                             );
                             ?>
 
@@ -514,7 +531,7 @@ function timeAgo($date)
                                 </span>
 
                                 <span class="booking-date">
-                                    <?php echo $date; ?>
+                                    <?php echo $date; ?> &middot; <?php echo htmlspecialchars($row['booking_status']); ?>
                                 </span>
 
                             </div>
@@ -548,13 +565,9 @@ function timeAgo($date)
                         <?php while ($row = $history_result->fetch_assoc()) { ?>
 
                             <?php
-                            if (!empty($row['purpose'])) {
-                                $display_name = $row['purpose'];
-                            } else {
-                                $display_name = "Room #" . $row['room_id'];
-                            }
+                            $display_name = $row['room_name'];
 
-                            $ago = timeAgo($row['booking_date']);
+                            $ago = ($row['booking_status'] == 'Cancelled') ? 'Cancelled' : timeAgo($row['stay_date']);
                             ?>
 
                             <div class="history-item">

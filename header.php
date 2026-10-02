@@ -225,12 +225,12 @@ body.dark-mode .form-select {
         </a>
 
         <a href="Search.php"
-           class="<?php echo $currentPage == 'search.php' ? 'active' : ''; ?>">
+           class="<?php echo $currentPage == 'Search.php' ? 'active' : ''; ?>">
            Search
         </a>
 
         <a href="Booking.php"
-           class="<?php echo $currentPage == 'bookings.php' ? 'active' : ''; ?>">
+           class="<?php echo $currentPage == 'Booking.php' ? 'active' : ''; ?>">
            Bookings
         </a>
 

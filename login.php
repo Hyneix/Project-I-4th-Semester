@@ -2,6 +2,12 @@
 session_start();
 include "dbconnection.php";
 
+// Already logged in? No need to see the login form again
+if (isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
 $error = "";
 $success = "";
 
@@ -25,11 +31,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $row = $result->fetch_assoc();
 
             if (password_verify($password, $row['password'])) {
+                // New session id after login (stops session fixation)
+                session_regenerate_id(true);
+
                 $_SESSION['user_id'] = $row['user_id'];
                 $_SESSION['full_name'] = $row['full_name'];
                 $_SESSION['email'] = $row['email'];
 
-                header("Location: index.php");
+                // Go back to the page the user came from (set by Booking.php / my_bookings.php)
+                $go = $_SESSION['after_login'] ?? "index.php";
+                unset($_SESSION['after_login']);
+
+                header("Location: " . $go);
                 exit();
             } else {
                 $error = "Invalid username/email or password.";

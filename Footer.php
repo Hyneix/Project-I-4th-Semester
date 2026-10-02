@@ -99,7 +99,7 @@ body.dark-mode .site-footer {
             <h6>Quick Links</h6>
             <a href="index.php">Home</a>
             <a href="Search.php">Search</a>
-            <a href="#">Bookings</a>
+            <a href="my_bookings.php">Bookings</a>
             <a href="UserProfile.php">Profile</a>
         </div>
 

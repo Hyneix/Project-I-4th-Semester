@@ -20,12 +20,18 @@ $check_out = "";
 $guests = "";
 $purpose = "";
 
+
+
+
 // 3. Get room_id from the URL and make sure it is a valid number
 if (isset($_GET['room_id'])) {
     $room_id = intval($_GET['room_id']);
 } else {
     $room_id = 0;
 }
+
+$_SESSION['after_login'] = "Booking.php?room_id=" . $room_id;
+
 
 // 4. Get the room from the rooms table (only the ID comes from the URL)
 if ($room_id > 0) {
@@ -149,129 +155,124 @@ if ($room && $is_logged_in && $_SERVER["REQUEST_METHOD"] == "POST") {
 <title>Book Room - Room Booking System</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- Bootstrap CSS is only here because header.php uses its dark-mode switch -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
 <style>
+/* =========================================================
+   BASIC PAGE (same as index.php)
+   ========================================================= */
 body {
     font-family: Arial, sans-serif;
-    background-color: #ffffff;
+    background: #f5f5f5;
     color: #222222;
 }
 
-/* Two columns: form on the left, room on the right */
-.booking-page {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.booking-form {
-    flex: 1;
-    min-width: 300px;
-    padding: 25px;
-}
-
-.room-details {
-    flex: 1;
-    min-width: 300px;
-    padding: 25px;
-    background-color: #f5f5f5;
-    border-left: 1px solid #dddddd;
-}
-
 .page-title {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: bold;
-    margin-bottom: 5px;
+    margin: 10px 0 18px;
 }
 
 .back-link {
     display: inline-block;
-    margin-bottom: 15px;
+    margin-top: 30px;
     color: #222222;
     text-decoration: none;
+    font-size: 14px;
 }
 
-/* Each step is a section separated by a line */
-.step {
-    border-top: 1px solid #dddddd;
-    padding: 20px 0;
-    max-width: 480px;
+/* =========================================================
+   WHITE CARDS (same look as the cards on index.php)
+   ========================================================= */
+.card-box {
+    background: #fff;
+    border: 1px solid #e2e2e2;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 18px;
 }
 
-.step h2 {
-    font-size: 18px;
+.card-box h2 {
+    font-size: 16px;
     font-weight: bold;
-    margin-bottom: 12px;
+    margin: 0 0 14px;
 }
 
-.booking-form label {
-    display: block;
+.card-box label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 2px;
+}
+
+.info-line {
     font-size: 13px;
-    margin-bottom: 4px;
+    color: #777;
+    margin-bottom: 3px;
 }
 
-.booking-form input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #cccccc;
-    border-radius: 6px;
-    margin-bottom: 12px;
-}
-
-.booking-form input:focus {
-    border-color: #555555;
-    outline: none;
-}
-
-.booking-form input[readonly] {
-    background-color: #eeeeee;
-}
-
-/* Room card on the right */
+/* =========================================================
+   ROOM CARD (right side)
+   ========================================================= */
 .room-card {
-    background-color: #ffffff;
-    border: 1px solid #dddddd;
-    border-radius: 10px;
-    padding: 15px;
-    max-width: 480px;
+    background: #fff;
+    border: 1px solid #e2e2e2;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
-.room-image {
+.room-img-wrap {
+    position: relative;
+}
+
+.room-img-wrap img,
+.no-image {
     width: 100%;
     height: 220px;
     object-fit: cover;
-    border-radius: 8px;
+    display: block;
 }
 
 .no-image {
-    background-color: #e9ecef;
+    background: #e9ecef;
     color: #6c757d;
     text-align: center;
     line-height: 220px;
 }
 
+/* small status badge, top left (same as index.php) */
+.room-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+.badge-available   { background: #d6f5d6; color: #1c6e1c; }
+.badge-unavailable { background: #eeeeee; color: #666666; }
+
+.room-body {
+    padding: 12px 14px 14px;
+}
+
 .room-name {
     font-size: 18px;
     font-weight: bold;
-    margin-top: 12px;
-}
-
-.room-info {
-    font-size: 14px;
-    color: #555555;
-    margin-bottom: 3px;
+    margin-bottom: 4px;
 }
 
 .room-description {
-    font-size: 14px;
-    color: #666666;
+    font-size: 13px;
+    color: #777;
     margin-top: 10px;
 }
 
 /* Price summary */
 .summary {
-    border-top: 1px solid #dddddd;
+    border-top: 1px solid #e2e2e2;
     margin-top: 15px;
     padding-top: 12px;
     font-size: 14px;
@@ -284,21 +285,20 @@ body {
 }
 
 .summary-total {
-    border-top: 1px solid #dddddd;
+    border-top: 1px solid #e2e2e2;
     padding-top: 10px;
     margin-top: 10px;
     font-weight: bold;
 }
 
-/* Green Book Now button */
+/* Book Now button (blue, like the other buttons) */
 .book-button {
     display: block;
     width: 100%;
-    max-width: 480px;
-    margin-top: 20px;
+    margin-top: 18px;
     padding: 12px;
-    background-color: #2e7d32;
-    color: #ffffff;
+    background: #0d6efd;
+    color: #fff;
     border: none;
     border-radius: 25px;
     font-size: 16px;
@@ -309,79 +309,54 @@ body {
 }
 
 .book-button:hover {
-    background-color: #1b5e20;
+    background: #0b5ed7;
+    color: #fff;
 }
 
-/* Messages */
-.message {
-    max-width: 480px;
-    padding: 12px;
-    margin-bottom: 15px;
-    border-radius: 6px;
-    font-size: 14px;
+.page-bottom {
+    padding-bottom: 40px;
 }
 
-.message-error {
-    background-color: #333333;
-    color: #ffffff;
-}
-
-.message-success {
-    background-color: #e8f5e9;
-    border: 1px solid #2e7d32;
-}
-
-.not-found {
-    text-align: center;
-    padding: 60px 15px;
-}
-
-/* Dark mode (header.php adds "dark-mode") */
-body.dark-mode {
-    background-color: #212529;
-}
-
-body.dark-mode .room-details {
-    background-color: #1b1e21;
-    border-left-color: #343a40;
-}
-
+/* =========================================================
+   DARK MODE (header.php adds "dark-mode" to body)
+   ========================================================= */
+body.dark-mode .card-box,
 body.dark-mode .room-card {
-    background-color: #2b3035;
+    background: #2b3035;
     border-color: #495057;
+    color: #e0e0e0;
 }
 
-body.dark-mode .room-info,
-body.dark-mode .room-description {
-    color: #adb5bd;
+body.dark-mode .page-title {
+    color: #f1f1f1;
 }
 
 body.dark-mode .back-link {
     color: #e0e0e0;
 }
 
-body.dark-mode .step,
+body.dark-mode .card-box label {
+    color: #ccc;
+}
+
+body.dark-mode .info-line,
+body.dark-mode .room-description {
+    color: #adb5bd;
+}
+
 body.dark-mode .summary,
 body.dark-mode .summary-total {
     border-color: #495057;
 }
 
-body.dark-mode .booking-form input {
+body.dark-mode .form-control {
     background-color: #343a40;
     border-color: #495057;
-    color: #ffffff;
+    color: #fff;
 }
 
-body.dark-mode .message-success {
-    background-color: #1b3a1e;
-    color: #ffffff;
-}
-
-/* Small screens: columns stack, no side line */
-@media (max-width: 700px) {
-    .room-details {
-        border-left: none;
-    }
+body.dark-mode .form-control[readonly] {
+    background-color: #2b3035;
 }
 </style>
 </head>
@@ -390,10 +365,12 @@ body.dark-mode .message-success {
 
 <?php include "header.php"; ?>
 
+<div class="container page-bottom">
+
 <?php if (!$room) { ?>
 
     <!-- Room not found -->
-    <div class="not-found">
+    <div class="card-box text-center" style="margin-top: 40px;">
         <h1 class="page-title">Room not found</h1>
         <p>Sorry, this room does not exist.</p>
         <a href="Search.php" class="btn btn-dark">Back to Search</a>
@@ -401,30 +378,30 @@ body.dark-mode .message-success {
 
 <?php } else { ?>
 
+    <a href="Search.php" class="back-link">&larr; Back to search</a>
+
+    <h1 class="page-title">Book <?php echo htmlspecialchars($room['room_name']); ?></h1>
+
+    <?php if ($success_message != "") { ?>
+        <div class="alert alert-success"><?php echo htmlspecialchars($success_message); ?></div>
+    <?php } ?>
+
+    <?php if ($error_message != "") { ?>
+        <div class="alert alert-danger"><?php echo htmlspecialchars($error_message); ?></div>
+    <?php } ?>
+
     <!-- One form around both columns, so the Book Now button can sit on the right -->
     <form method="POST" action="Booking.php?room_id=<?php echo (int) $room['room_id']; ?>"
           id="bookingForm" onsubmit="return validateBooking();">
 
-        <div class="booking-page">
+        <div class="row g-4">
 
             <!-- ============ LEFT: booking form ============ -->
-            <div class="booking-form">
-
-                <a href="Search.php" class="back-link">&larr; Back to search</a>
-
-                <h1 class="page-title">Book <?php echo htmlspecialchars($room['room_name']); ?></h1>
-
-                <?php if ($success_message != "") { ?>
-                    <div class="message message-success"><?php echo htmlspecialchars($success_message); ?></div>
-                <?php } ?>
-
-                <?php if ($error_message != "") { ?>
-                    <div class="message message-error"><?php echo htmlspecialchars($error_message); ?></div>
-                <?php } ?>
+            <div class="col-lg-7">
 
                 <?php if (!$is_logged_in) { ?>
 
-                    <div class="step">
+                    <div class="card-box">
                         <h2>Please login to book a room.</h2>
                         <a href="login.php" class="btn btn-dark">Login</a>
                     </div>
@@ -432,45 +409,55 @@ body.dark-mode .message-success {
                 <?php } else { ?>
 
                     <!-- Step 1: dates and guests -->
-                    <div class="step">
+                    <div class="card-box">
                         <h2>Step 1: Your stay</h2>
 
-                        <label for="check_in">Check-in date</label>
-                        <input type="date" id="check_in" name="check_in"
-                               min="<?php echo date('Y-m-d'); ?>"
-                               value="<?php echo htmlspecialchars($check_in); ?>"
-                               onchange="calculateTotal()">
+                        <div class="mb-3">
+                            <label for="check_in">Check-in date</label>
+                            <input type="date" id="check_in" name="check_in" class="form-control"
+                                   min="<?php echo date('Y-m-d'); ?>"
+                                   value="<?php echo htmlspecialchars($check_in); ?>"
+                                   onchange="calculateTotal()">
+                        </div>
 
-                        <label for="check_out">Check-out date</label>
-                        <input type="date" id="check_out" name="check_out"
-                               value="<?php echo htmlspecialchars($check_out); ?>"
-                               onchange="calculateTotal()">
+                        <div class="mb-3">
+                            <label for="check_out">Check-out date</label>
+                            <input type="date" id="check_out" name="check_out" class="form-control"
+                                   value="<?php echo htmlspecialchars($check_out); ?>"
+                                   onchange="calculateTotal()">
+                        </div>
 
-                        <label for="guests">Guests (maximum <?php echo (int) $room['capacity']; ?>)</label>
-                        <input type="number" id="guests" name="guests"
-                               min="1" max="<?php echo (int) $room['capacity']; ?>"
-                               value="<?php echo htmlspecialchars($guests); ?>">
+                        <div>
+                            <label for="guests">Guests (maximum <?php echo (int) $room['capacity']; ?>)</label>
+                            <input type="number" id="guests" name="guests" class="form-control"
+                                   min="1" max="<?php echo (int) $room['capacity']; ?>"
+                                   value="<?php echo htmlspecialchars($guests); ?>">
+                        </div>
                     </div>
 
                     <!-- Step 2: user information -->
-                    <div class="step">
+                    <div class="card-box">
                         <h2>Step 2: Your details</h2>
 
-                        <label for="full_name">Name</label>
-                        <input type="text" id="full_name" readonly
-                               value="<?php echo htmlspecialchars($_SESSION['full_name']); ?>">
+                        <div class="mb-3">
+                            <label for="full_name">Name</label>
+                            <input type="text" id="full_name" class="form-control" readonly
+                                   value="<?php echo htmlspecialchars($_SESSION['full_name']); ?>">
+                        </div>
 
-                        <label for="purpose">Purpose / note (optional)</label>
-                        <input type="text" id="purpose" name="purpose" maxlength="255"
-                               placeholder="e.g. Family trip"
-                               value="<?php echo htmlspecialchars($purpose); ?>">
+                        <div>
+                            <label for="purpose">Purpose / note (optional)</label>
+                            <input type="text" id="purpose" name="purpose" class="form-control"
+                                   maxlength="255" placeholder="e.g. Family trip"
+                                   value="<?php echo htmlspecialchars($purpose); ?>">
+                        </div>
                     </div>
 
                     <!-- Step 3: fixed times used by the system -->
-                    <div class="step">
+                    <div class="card-box">
                         <h2>Step 3: House rules</h2>
-                        <div class="room-info">Check-in: from 2 PM</div>
-                        <div class="room-info">Check-out: until 11 AM</div>
+                        <div class="info-line">Check-in: from 2 PM</div>
+                        <div class="info-line">Check-out: until 11 AM</div>
                     </div>
 
                 <?php } ?>
@@ -479,54 +466,64 @@ body.dark-mode .message-success {
 
 
             <!-- ============ RIGHT: room details (from the database) ============ -->
-            <div class="room-details">
+            <div class="col-lg-5">
 
                 <div class="room-card">
 
-                    <?php if (!empty($room['image'])) { ?>
-                        <img src="images/<?php echo htmlspecialchars($room['image']); ?>"
-                             alt="<?php echo htmlspecialchars($room['room_name']); ?>"
-                             class="room-image">
-                    <?php } else { ?>
-                        <div class="room-image no-image">No Image Available</div>
-                    <?php } ?>
+                    <div class="room-img-wrap">
+                        <?php if (!empty($room['image'])) { ?>
+                            <img src="images/<?php echo htmlspecialchars($room['image']); ?>"
+                                 alt="<?php echo htmlspecialchars($room['room_name']); ?>">
+                        <?php } else { ?>
+                            <div class="no-image">No Image Available</div>
+                        <?php } ?>
 
-                    <div class="room-name"><?php echo htmlspecialchars($room['room_name']); ?></div>
-                    <div class="room-info">Type: <?php echo htmlspecialchars($room['room_type']); ?></div>
-                    <div class="room-info">Location: <?php echo htmlspecialchars($room['location']); ?></div>
-                    <div class="room-info">Capacity: <?php echo (int) $room['capacity']; ?> guest(s)</div>
-                    <div class="room-info">Status: <?php echo htmlspecialchars($room['status']); ?></div>
+                        <?php if (strtolower($room['status']) == "available") { ?>
+                            <span class="room-badge badge-available">Available</span>
+                        <?php } else { ?>
+                            <span class="room-badge badge-unavailable"><?php echo htmlspecialchars($room['status']); ?></span>
+                        <?php } ?>
+                    </div>
 
-                    <?php if (!empty($room['description'])) { ?>
-                        <div class="room-description">
-                            <?php echo nl2br(htmlspecialchars($room['description'])); ?>
-                        </div>
-                    <?php } ?>
+                    <div class="room-body">
 
-                    <!-- Price summary (JavaScript fills in the numbers) -->
-                    <div class="summary" id="priceBox"
-                         data-price="<?php echo (float) $room['price_per_night']; ?>">
+                        <div class="room-name"><?php echo htmlspecialchars($room['room_name']); ?></div>
+                        <div class="info-line">Type: <?php echo htmlspecialchars($room['room_type']); ?></div>
+                        <div class="info-line">Location: <?php echo htmlspecialchars($room['location']); ?></div>
+                        <div class="info-line">Capacity: <?php echo (int) $room['capacity']; ?> guest(s)</div>
 
-                        <div class="summary-row">
-                            <span>Check-in</span>
-                            <span id="showCheckIn">-</span>
+                        <?php if (!empty($room['description'])) { ?>
+                            <div class="room-description">
+                                <?php echo nl2br(htmlspecialchars($room['description'])); ?>
+                            </div>
+                        <?php } ?>
+
+                        <!-- Price summary (JavaScript fills in the numbers) -->
+                        <div class="summary" id="priceBox"
+                             data-price="<?php echo (float) $room['price_per_night']; ?>">
+
+                            <div class="summary-row">
+                                <span>Check-in</span>
+                                <span id="showCheckIn">-</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Check-out</span>
+                                <span id="showCheckOut">-</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Price per night</span>
+                                <span>Rs. <?php echo number_format((float) $room['price_per_night']); ?></span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Number of nights</span>
+                                <span id="showNights">0</span>
+                            </div>
+                            <div class="summary-row summary-total">
+                                <span>TOTAL</span>
+                                <span id="showTotal">Rs. 0</span>
+                            </div>
                         </div>
-                        <div class="summary-row">
-                            <span>Check-out</span>
-                            <span id="showCheckOut">-</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Price per night</span>
-                            <span>Rs. <?php echo number_format((float) $room['price_per_night']); ?></span>
-                        </div>
-                        <div class="summary-row">
-                            <span>Number of nights</span>
-                            <span id="showNights">0</span>
-                        </div>
-                        <div class="summary-row summary-total">
-                            <span>TOTAL</span>
-                            <span id="showTotal">Rs. 0</span>
-                        </div>
+
                     </div>
 
                 </div>
@@ -544,6 +541,8 @@ body.dark-mode .message-success {
     </form>
 
 <?php } ?>
+
+</div>
 
 <?php include "Footer.php"; ?>
 
