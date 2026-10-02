@@ -1,4 +1,9 @@
 <?php
+// Start the session FIRST (before any HTML) so header.php can see $_SESSION['user_id']
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 // index.php - homepage
 // Shows: hero, search, popular destinations, rooms from the database,
 //        features, newsletter CTA, footer.
