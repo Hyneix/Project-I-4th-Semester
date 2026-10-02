@@ -84,22 +84,6 @@ $history_result = $stmt2->get_result();
 $stmt2->close();
 
 
-/* My bookings */
-$sql = "SELECT purpose, room_id, booking_status, booking_date
-        FROM bookings
-        WHERE user_id = ?
-        ORDER BY created_at DESC
-        LIMIT 5";
-
-$stmt3 = $conn->prepare($sql);
-$stmt3->bind_param("i", $user_id);
-$stmt3->execute();
-
-$my_bookings_result = $stmt3->get_result();
-
-$stmt3->close();
-
-
 /* Total bookings */
 $sql = "SELECT COUNT(*) AS total
         FROM bookings
@@ -282,26 +266,6 @@ function timeAgo($date)
             font-size: 12px;
         }
 
-        /* ---------- Find Room grid: 2 per row, centered ---------- */
-        .room-filter-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            justify-items: center;
-            gap: 6px;
-        }
-
-        .room-filter {
-            width: 70px;
-            height: 70px;
-            background-color: #f1f3f5;
-            display: inline-block;
-            text-align: center;
-            padding-top: 18px;
-            font-size: 10px;
-            border-radius: 4px;
-            color: #666;
-        }
-
         /* ---------- History ---------- */
         .history-item {
             padding: 10px;
@@ -317,37 +281,6 @@ function timeAgo($date)
             float: right;
             color: #aaa;
             font-size: 14px;
-        }
-
-        /* ---------- Booking list ---------- */
-        .booking-list-item {
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-        }
-
-        .booking-list-item:last-child {
-            border-bottom: none;
-        }
-
-        .mini-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: #555;
-            text-align: center;
-            line-height: 32px;
-            font-size: 12px;
-            color: #fff;
-            margin-right: 10px;
-        }
-
-        .empty-msg {
-            text-align: center;
-            color: #999;
-            font-size: 13px;
-            padding: 15px;
         }
 
         /* ---------- Footer (same as index.php) ---------- */
@@ -410,11 +343,6 @@ function timeAgo($date)
         }
 
         body.dark-mode .booking-date {
-            color: #adb5bd;
-        }
-
-        body.dark-mode .room-filter {
-            background-color: #343a40;
             color: #adb5bd;
         }
 
@@ -550,7 +478,7 @@ function timeAgo($date)
 
 
         <!-- Center Content -->
-        <div class="col-md-6">
+        <div class="col-md-9">
 
             <!-- Upcoming Bookings -->
             <div class="card">
@@ -665,145 +593,13 @@ function timeAgo($date)
         </div>
 
 
-        <!-- Right Sidebar -->
-        <div class="col-md-3">
 
-            <!-- Find Room -->
-            <div class="card">
-
-                <div class="card-body">
-
-                    <h6 class="card-title">
-                        Find room
-                    </h6>
-
-                    <div class="room-filter-grid">
-
-                        <div class="room-filter">
-                            &#127968;<br>All types
-                        </div>
-
-                        <div class="room-filter">
-                            &#128716;<br>Studio
-                        </div>
-
-                        <div class="room-filter">
-                            &#127969;<br>Suite
-                        </div>
-
-                        <div class="room-filter">
-                            &#128197;<br>Upcoming
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- My Bookings -->
-            <div class="card">
-
-                <div class="card-body">
-
-                    <h6 class="card-title">
-                        My bookings
-                    </h6>
-
-                    <div class="booking-list-item">
-
-                        <div class="mini-avatar">
-                            #
-                        </div>
-
-                        <div>
-
-                            <span style="font-size:12px;">
-                                Total bookings
-                            </span>
-
-                            <br>
-
-                            <small class="text-muted">
-                                <?php echo $total_bookings; ?> booking(s)
-                            </small>
-
-                        </div>
-
-                    </div>
-
-
-                    <?php if ($my_bookings_result->num_rows > 0) { ?>
-
-                        <?php while ($row = $my_bookings_result->fetch_assoc()) { ?>
-
-                            <?php
-                            if (!empty($row['purpose'])) {
-                                $display_name = $row['purpose'];
-                            } else {
-                                $display_name = "Room #" . $row['room_id'];
-                            }
-
-                            $status = $row['booking_status'];
-
-                            $date = date(
-                                "M j",
-                                strtotime($row['booking_date'])
-                            );
-
-                            $first_letter = strtoupper(
-                                substr($display_name, 0, 1)
-                            );
-                            ?>
-
-                            <div class="booking-list-item">
-
-                                <div class="mini-avatar">
-                                    <?php echo $first_letter; ?>
-                                </div>
-
-                                <div>
-
-                                    <span style="font-size:12px;">
-                                        <?php echo htmlspecialchars($display_name); ?>
-                                    </span>
-
-                                    <br>
-
-                                    <small class="text-muted">
-                                        <?php echo htmlspecialchars($status); ?>
-                                        &bull;
-                                        <?php echo $date; ?>
-                                    </small>
-
-                                </div>
-
-                            </div>
-
-                        <?php } ?>
-
-                    <?php } else { ?>
-
-                        <div class="empty-msg">
-                            No bookings yet
-                        </div>
-
-                    <?php } ?>
-
-                </div>
-
-            </div>
-
-        </div>
 
     </div>
 
 </div>
 
-<footer>
-    &copy; 2026 Room Booking System. All rights reserved.
-</footer>
+<?php include "Footer.php"; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

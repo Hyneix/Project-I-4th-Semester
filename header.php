@@ -1,7 +1,7 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+// if (session_status() == PHP_SESSION_NONE) {
+//     session_start();
+// }
 
 // Name of the page that is open now (example: "userprofile.php")
 $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
@@ -10,14 +10,17 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
 <style>
 /* ============================================================
    SIMPLE FLEXBOX HEADER
-   Logo -> LEFT | Navigation -> MIDDLE | Toggle -> RIGHT
+   Logo -> LEFT | Navigation -> MIDDLE | User + Toggle -> RIGHT
    ============================================================ */
 .site-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 15px 25px;               /* small margin from screen edges */
+    flex-wrap: wrap;                  /* wraps on small screens */
+    gap: 10px;
+    padding: 12px 25px;
     background: #fff;
+    border-bottom: 1px solid #e5e5e5;
 }
 
 /* ---------- LEFT: logo ---------- */
@@ -26,7 +29,6 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
     align-items: center;
 }
 
-/* Logo (slightly larger text/size) */
 .left-section .logo img {
     height: 35px;
 }
@@ -38,23 +40,16 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
     gap: 8px;
 }
 
-/* Navigation links look like simple buttons */
 .nav-section a {
-    padding: 8px 12px;
+    padding: 8px 14px;
     border-radius: 5px;
     text-decoration: none;
-    font-size: 16px;                  /* readable text size */
+    font-size: 15px;
     color: #333;
-    transition: 0.2s;                 /* smooth hover effect */
 }
 
-/* Hover: highlighted button */
-.nav-section a:hover {
-    background-color: #333;
-    color: white;
-}
-
-/* Active page: stays highlighted without hovering */
+/* Hover and active page: dark background, white text */
+.nav-section a:hover,
 .nav-section a.active {
     background-color: #333;
     color: white;
@@ -65,48 +60,38 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-left: 30px;                /* reasonable gap before the toggle */
 }
 
 /* Login / Register / Logout buttons */
 .btn-header {
-    padding: 8px 14px;
+    padding: 7px 14px;
     border-radius: 5px;
     text-decoration: none;
-    font-size: 15px;
-    transition: 0.2s;
+    font-size: 14px;
 }
 
-.btn-outline {
-    border: 1px solid #0d6efd;
-    color: #0d6efd;
+/* White button with dark border (Login, Logout) */
+.btn-header-outline {
+    border: 1px solid #333;
+    color: #333;
     background: #fff;
 }
 
-.btn-outline:hover {
-    background: #0d6efd;
+.btn-header-outline:hover {
+    background: #333;
     color: #fff;
 }
 
-.btn-outline-secondary {
-    border: 1px solid #6c757d;
-    color: #6c757d;
-    background: #fff;
-}
-
-.btn-outline-secondary:hover {
-    background: #6c757d;
+/* Dark button (Register) */
+.btn-header-dark {
+    border: 1px solid #333;
     color: #fff;
+    background: #333;
 }
 
-.btn-primary {
-    background: #0d6efd;
-    color: #fff;
-    border: 1px solid #0d6efd;
-}
-
-.btn-primary:hover {
-    background: #0b5ed7;
+.btn-header-dark:hover {
+    background: #555;
+    border-color: #555;
 }
 
 /* Round user icon that shows the first letter of the name */
@@ -114,7 +99,7 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
     width: 35px;
     height: 35px;
     border-radius: 50%;
-    background: #0d6efd;
+    background: #333;
     color: #fff;
     font-weight: bold;
     font-size: 16px;
@@ -123,13 +108,40 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
     justify-content: center;
 }
 
-/* Theme toggle sits inside right-section (far right) */
-.header-toggle {
-    margin-left: 10px;
+/* Theme toggle (Bootstrap switch, made gray instead of blue) */
+.header-toggle .form-check {
+    margin: 0;
+}
+
+.header-toggle .form-check-input {
+    cursor: pointer;
+}
+
+.header-toggle .form-check-input:checked {
+    background-color: #333;
+    border-color: #333;
+}
+
+.header-toggle .form-check-input:focus {
+    box-shadow: none;
+    border-color: #333;
+}
+
+/* ---------- Small screens: navigation goes under the logo row ---------- */
+@media (max-width: 768px) {
+    .site-header {
+        padding: 10px 15px;
+    }
+
+    .nav-section {
+        order: 3;                     /* move below logo and right section */
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 /* ============================================================
-   DARK MODE - anchor tags and header also toggle with the theme
+   DARK MODE
    ============================================================ */
 body.dark-mode {
     background: #212529;
@@ -138,44 +150,43 @@ body.dark-mode {
 
 body.dark-mode .site-header {
     background: #1b1e21;
+    border-bottom-color: #343a40;
 }
 
-/* Navigation anchors in dark mode */
 body.dark-mode .nav-section a {
     color: #e0e0e0;
 }
 
-body.dark-mode .nav-section a:hover {
-    background-color: #0d6efd;
-    color: white;
-}
-
+body.dark-mode .nav-section a:hover,
 body.dark-mode .nav-section a.active {
-    background-color: #0d6efd;
-    color: white;
+    background-color: #e0e0e0;
+    color: #212529;
 }
 
-/* Login / Register / Logout buttons in dark mode */
-body.dark-mode .btn-outline {
-    border-color: #6ea8fe;
-    color: #6ea8fe;
-    background: transparent;
-}
-
-body.dark-mode .btn-outline:hover {
-    background: #0d6efd;
-    color: #fff;
-}
-
-body.dark-mode .btn-outline-secondary {
+body.dark-mode .btn-header-outline {
     border-color: #adb5bd;
-    color: #adb5bd;
+    color: #e0e0e0;
     background: transparent;
 }
 
-body.dark-mode .btn-outline-secondary:hover {
-    background: #6c757d;
-    color: #fff;
+body.dark-mode .btn-header-outline:hover {
+    background: #e0e0e0;
+    color: #212529;
+}
+
+body.dark-mode .btn-header-dark {
+    background: #e0e0e0;
+    border-color: #e0e0e0;
+    color: #212529;
+}
+
+body.dark-mode .btn-header-dark:hover {
+    background: #bbbbbb;
+}
+
+body.dark-mode .user-icon {
+    background: #e0e0e0;
+    color: #212529;
 }
 
 body.dark-mode .form-select {
@@ -218,7 +229,10 @@ body.dark-mode .form-select {
            Search
         </a>
 
-        <a href="#">Bookings</a>
+        <a href="Booking.php"
+           class="<?php echo $currentPage == 'bookings.php' ? 'active' : ''; ?>">
+           Bookings
+        </a>
 
         <a href="UserProfile.php"
            class="<?php echo $currentPage == 'userprofile.php' ? 'active' : ''; ?>">
@@ -245,16 +259,16 @@ body.dark-mode .form-select {
 
             <!-- Logout is shown ONLY on the profile page -->
             <?php if ($currentPage == 'userprofile.php'): ?>
-                <a href="logout.php" class="btn-header btn-outline-secondary">
+                <a href="logout.php" class="btn-header btn-header-outline">
                     Logout
                 </a>
             <?php endif; ?>
 
         <?php else: ?>
-            <a href="login.php" class="btn-header btn-outline">
+            <a href="login.php" class="btn-header btn-header-outline">
                 Login
             </a>
-            <a href="register.php" class="btn-header btn-primary">
+            <a href="register.php" class="btn-header btn-header-dark">
                 Register
             </a>
         <?php endif; ?>
