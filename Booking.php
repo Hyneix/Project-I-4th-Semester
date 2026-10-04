@@ -316,48 +316,6 @@ body {
 .page-bottom {
     padding-bottom: 40px;
 }
-
-/* =========================================================
-   DARK MODE (header.php adds "dark-mode" to body)
-   ========================================================= */
-body.dark-mode .card-box,
-body.dark-mode .room-card {
-    background: #2b3035;
-    border-color: #495057;
-    color: #e0e0e0;
-}
-
-body.dark-mode .page-title {
-    color: #f1f1f1;
-}
-
-body.dark-mode .back-link {
-    color: #e0e0e0;
-}
-
-body.dark-mode .card-box label {
-    color: #ccc;
-}
-
-body.dark-mode .info-line,
-body.dark-mode .room-description {
-    color: #adb5bd;
-}
-
-body.dark-mode .summary,
-body.dark-mode .summary-total {
-    border-color: #495057;
-}
-
-body.dark-mode .form-control {
-    background-color: #343a40;
-    border-color: #495057;
-    color: #fff;
-}
-
-body.dark-mode .form-control[readonly] {
-    background-color: #2b3035;
-}
 </style>
 </head>
 

@@ -367,44 +367,6 @@ body {
 }
 
 /* =========================================================
-   DARK MODE support for the new sections
-   ========================================================= */
-body.dark-mode .search-bar-card,
-body.dark-mode .room-card,
-body.dark-mode .feature-card,
-body.dark-mode .newsletter-box {
-    background: #2b3035;
-    border-color: #495057;
-    color: #e0e0e0;
-}
-
-body.dark-mode .room-name {
-    color: #f1f1f1;
-}
-
-body.dark-mode .room-loc,
-body.dark-mode .feature-card p,
-body.dark-mode .newsletter-box p {
-    color: #adb5bd;
-}
-
-body.dark-mode .section-title {
-    color: #f1f1f1;
-}
-
-body.dark-mode .search-bar-card label {
-    color: #ccc;
-}
-
-body.dark-mode .search-bar-card .form-control {
-    color: #e0e0e0;
-}
-
-body.dark-mode .search-bar-card .form-control::placeholder {
-    color: #888;
-}
-
-/* =========================================================
    RESPONSIVE
    ========================================================= */
 @media (max-width: 992px) {

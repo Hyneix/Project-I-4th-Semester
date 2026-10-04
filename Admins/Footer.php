@@ -69,6 +69,12 @@
     color: #999999;
 }
 
+/* Dark mode: footer stays dark */
+body.dark-mode .site-footer {
+    background-color: #111111;
+    color: #adb5bd;
+}
+
 /* Small screens: stack the columns */
 @media (max-width: 700px) {
     .footer-main {
@@ -96,7 +102,6 @@
             <a href="<?php echo $base; ?>Search.php">Search</a>
             <a href="<?php echo $base; ?>my_bookings.php">Bookings</a>
             <a href="<?php echo $base; ?>UserProfile.php">Profile</a>
-            <a href="<?php echo $base; ?>ContactUs.php">Contact Us</a>
         </div>
 
         <!-- 3. Contact -->

@@ -1,0 +1,245 @@
+/* admin.css - one stylesheet for all admin pages.
+   Colours, fonts, header and buttons match the user side (header.php). */
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    color: #222222;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* footer stays at the bottom of short pages */
+body > .site-footer {
+    margin-top: auto;
+}
+
+/* ---------- Header ---------- */
+.site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 25px;
+    background: #fff;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.nav-section,
+.right-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-section a,
+.right-section a {
+    padding: 8px 14px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 15px;
+    color: #333;
+}
+
+.nav-section a:hover,
+.nav-section a.active,
+.right-section a:hover {
+    background: #333;
+    color: #fff;
+}
+
+.admin-label {
+    padding: 4px 12px;
+    border: 1px solid #333;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-decoration: none;
+    color: #333;
+}
+
+.admin-label:hover {
+    background: #333;
+    color: #fff;
+}
+
+.user-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #333;
+    color: #fff;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .site-header { padding: 10px 15px; }
+    .nav-section { order: 3; width: 100%; justify-content: center; flex-wrap: wrap; }
+}
+
+/* ---------- Page layout ---------- */
+.page-content {
+    margin: 30px auto 50px;
+}
+
+.page-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.page-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.count-text {
+    font-size: 15px;
+    font-weight: normal;
+    color: #6c757d;
+}
+
+.box-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* ---------- White boxes (cards and tables share one style) ---------- */
+.box,
+.summary-card,
+.table-box,
+.admin-room-card {
+    background: #fff;
+    border: 1px solid #e2e2e2;
+    border-radius: 12px;
+}
+
+.box,
+.summary-card {
+    padding: 22px;
+}
+
+.summary-card { height: 100%; }
+.summary-card .label { font-size: 14px; color: #777; margin-bottom: 4px; }
+.summary-card .number { font-size: 32px; font-weight: bold; }
+
+.table-box { overflow-x: auto; }
+.table-box table { margin: 0; }
+.table-box th { background: #f0f0f0; font-size: 14px; white-space: nowrap; }
+.table-box td { font-size: 14px; }
+
+/* ---------- Status labels (black, white, gray) ---------- */
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status-approved,
+.status-available   { background: #333; color: #fff; }
+.status-pending,
+.status-booked      { background: #eee; color: #333; border: 1px solid #bbb; }
+.status-cancelled,
+.status-maintenance { background: #fff; color: #777; border: 1px solid #ccc; }
+
+/* ---------- Buttons and forms ---------- */
+.btn-dark {
+    --bs-btn-bg: #333;
+    --bs-btn-border-color: #333;
+    --bs-btn-hover-bg: #555;
+    --bs-btn-hover-border-color: #555;
+    --bs-btn-active-bg: #555;
+    --bs-btn-active-border-color: #555;
+}
+
+.btn-outline-dark {
+    --bs-btn-color: #333;
+    --bs-btn-border-color: #333;
+    --bs-btn-hover-bg: #333;
+    --bs-btn-hover-border-color: #333;
+    --bs-btn-active-bg: #333;
+    --bs-btn-active-border-color: #333;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #333;
+    box-shadow: none;
+}
+
+.form-label { font-size: 14px; font-weight: bold; }
+
+/* login / register box */
+.auth-box { max-width: 440px; margin: 50px auto; }
+
+/* ---------- Room cards (manage_rooms.php) ---------- */
+.admin-room-card { overflow: hidden; height: 100%; }
+.admin-room-img { position: relative; }
+
+.admin-room-img img,
+.admin-room-noimg {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+    display: block;
+}
+
+.admin-room-noimg {
+    background: #eee;
+    color: #888;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-room-status { position: absolute; top: 10px; left: 10px; }
+.admin-room-body { padding: 16px 18px 18px; }
+.admin-room-name { font-size: 17px; font-weight: bold; }
+.admin-room-id { font-size: 13px; font-weight: normal; color: #888; margin-left: 4px; }
+.admin-room-desc { font-size: 13px; color: #777; margin: 6px 0 12px; min-height: 38px; }
+
+.admin-room-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 7px 0;
+    border-top: 1px solid #eee;
+}
+
+.admin-room-row span:first-child { color: #777; }
+
+.admin-room-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 14px;
+    border-top: 1px solid #eee;
+}
+
+/* ---------- Recent messages on the dashboard ---------- */
+.message-row {
+    display: block;
+    padding: 12px 8px;
+    border-top: 1px solid #eee;
+    color: #222;
+    text-decoration: none;
+}
+
+.message-row:hover { background: #f7f7f7; }
+.message-title { font-size: 14px; font-weight: bold; }
+.message-date { font-size: 12px; color: #888; white-space: nowrap; }
+.message-preview { font-size: 13px; color: #777; margin-top: 2px; }

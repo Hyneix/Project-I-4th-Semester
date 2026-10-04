@@ -230,56 +230,6 @@ body {
     color: #888888;
     padding: 30px;
 }
-
-/* Dark mode: cards and badges stay readable */
-body.dark-mode .room-card {
-    background: #2b3035;
-    border-color: #495057;
-}
-
-body.dark-mode .room-link {
-    color: #e0e0e0;
-}
-
-body.dark-mode .room-name,
-body.dark-mode .results-title {
-    color: #f8f9fa;
-}
-
-body.dark-mode .room-type,
-body.dark-mode .room-info,
-body.dark-mode .room-desc {
-    color: #adb5bd;
-}
-
-body.dark-mode .available {
-    background-color: #444444;
-    color: #ffffff;
-}
-
-body.dark-mode .unavailable {
-    background-color: #111111;
-    color: #adb5bd;
-}
-
-body.dark-mode .search-form-box {
-    background: #2b3035;
-    border-color: #495057;
-}
-
-body.dark-mode .search-form-box label {
-    color: #ccc;
-}
-
-body.dark-mode .search-form-box .form-control {
-    background-color: #343a40;
-    border-color: #495057;
-    color: white;
-}
-
-body.dark-mode .no-results {
-    color: #adb5bd;
-}
 </style>
 </head>
 

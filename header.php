@@ -10,7 +10,7 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
 <style>
 /* ============================================================
    SIMPLE FLEXBOX HEADER
-   Logo -> LEFT | Navigation -> MIDDLE | User + Toggle -> RIGHT
+   Logo -> LEFT | Navigation -> MIDDLE | User -> RIGHT
    ============================================================ */
 .site-header {
     display: flex;
@@ -55,7 +55,7 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
     color: white;
 }
 
-/* ---------- RIGHT: user avatar / login buttons + theme toggle ---------- */
+/* ---------- RIGHT: user avatar / login buttons ---------- */
 .right-section {
     display: flex;
     align-items: center;
@@ -108,25 +108,6 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
     justify-content: center;
 }
 
-/* Theme toggle (Bootstrap switch, made gray instead of blue) */
-.header-toggle .form-check {
-    margin: 0;
-}
-
-.header-toggle .form-check-input {
-    cursor: pointer;
-}
-
-.header-toggle .form-check-input:checked {
-    background-color: #333;
-    border-color: #333;
-}
-
-.header-toggle .form-check-input:focus {
-    box-shadow: none;
-    border-color: #333;
-}
-
 /* ---------- Small screens: navigation goes under the logo row ---------- */
 @media (max-width: 768px) {
     .site-header {
@@ -140,69 +121,10 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
     }
 }
 
-/* ============================================================
-   DARK MODE
-   ============================================================ */
-body.dark-mode {
-    background: #212529;
-    color: white;
-}
-
-body.dark-mode .site-header {
-    background: #1b1e21;
-    border-bottom-color: #343a40;
-}
-
-body.dark-mode .nav-section a {
-    color: #e0e0e0;
-}
-
-body.dark-mode .nav-section a:hover,
-body.dark-mode .nav-section a.active {
-    background-color: #e0e0e0;
-    color: #212529;
-}
-
-body.dark-mode .btn-header-outline {
-    border-color: #adb5bd;
-    color: #e0e0e0;
-    background: transparent;
-}
-
-body.dark-mode .btn-header-outline:hover {
-    background: #e0e0e0;
-    color: #212529;
-}
-
-body.dark-mode .btn-header-dark {
-    background: #e0e0e0;
-    border-color: #e0e0e0;
-    color: #212529;
-}
-
-body.dark-mode .btn-header-dark:hover {
-    background: #bbbbbb;
-}
-
-body.dark-mode .user-icon {
-    background: #e0e0e0;
-    color: #212529;
-}
-
-body.dark-mode .form-select {
-    background-color: #343a40;
-    color: white;
-    border-color: #495057;
-}
-
-/* Light arrow for dropdown lists in dark mode */
-body.dark-mode .form-select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23dee2e6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-}
 </style>
 
 <!-- Simple flexbox header:
-     LEFT = logo | MIDDLE = navigation | RIGHT = user + toggle -->
+     LEFT = logo | MIDDLE = navigation | RIGHT = user -->
 <header class="site-header">
 
     <!-- LEFT SECTION: logo -->
@@ -225,12 +147,12 @@ body.dark-mode .form-select {
         </a>
 
         <a href="Search.php"
-           class="<?php echo $currentPage == 'Search.php' ? 'active' : ''; ?>">
+           class="<?php echo $currentPage == 'search.php' ? 'active' : ''; ?>">
            Search
         </a>
 
         <a href="Booking.php"
-           class="<?php echo $currentPage == 'Booking.php' ? 'active' : ''; ?>">
+           class="<?php echo $currentPage == 'booking.php' ? 'active' : ''; ?>">
            Bookings
         </a>
 
@@ -239,9 +161,14 @@ body.dark-mode .form-select {
            Profile
         </a>
 
+        <a href="ContactUs.php"
+           class="<?php echo $currentPage == 'contactus.php' ? 'active' : ''; ?>">
+           Contact Us
+        </a>
+
     </nav>
 
-    <!-- RIGHT SECTION: user avatar / login buttons + theme toggle -->
+    <!-- RIGHT SECTION: user avatar / login buttons -->
     <div class="right-section">
 
         <?php if (isset($_SESSION['user_id'])): ?>
@@ -273,38 +200,6 @@ body.dark-mode .form-select {
             </a>
         <?php endif; ?>
 
-        <!-- THEME TOGGLE (far right) -->
-        <div class="header-toggle">
-            <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="themeSwitch">
-            </div>
-        </div>
-
     </div>
 
 </header>
-
-<script>
-/* Light/Dark theme toggle - shared by every page that includes header.php.
-   ONE localStorage key ("theme") is used on index.php, Search.php
-   and UserProfile.php, so the choice is remembered everywhere. */
-
-// 1. Read the saved theme when the page loads and apply it
-const savedTheme = localStorage.getItem("theme");
-
-if (savedTheme === "dark") {
-    document.body.classList.add("dark-mode");
-    document.getElementById("themeSwitch").checked = true;
-}
-
-// 2. When the toggle is clicked, change the theme and save the choice
-document.getElementById("themeSwitch").addEventListener("change", function() {
-    if (this.checked) {
-        document.body.classList.add("dark-mode");
-        localStorage.setItem("theme", "dark");
-    } else {
-        document.body.classList.remove("dark-mode");
-        localStorage.setItem("theme", "light");
-    }
-});
-</script>

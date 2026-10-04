@@ -1,254 +1,189 @@
 <?php
-include "dbconnection.php";
+// Create an admin account.
+// - No admins yet: anyone can create the first one (it becomes Super Admin).
+// - After that: only a logged-in Super Admin can add admins and choose their role.
+session_start();
+include "../dbconnection.php";
 
-$message = "";
-$type = "";
+$result = mysqli_query($conn, "SELECT COUNT(*) FROM admins");
+$is_first_admin = (mysqli_fetch_row($result)[0] == 0);
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = trim($_POST['username']);
+if (!$is_first_admin) {
+    // Must be logged in
+    if (!isset($_SESSION['admin_id'])) {
+        header("Location: admin_login.php");
+        exit();
+    }
+
+    // Must be a Super Admin
+    $admin_id = (int) $_SESSION['admin_id'];
+    $sql = "SELECT admin_roles.role_name
+            FROM admins
+            JOIN admin_roles ON admins.role_id = admin_roles.role_id
+            WHERE admins.admin_id = $admin_id";
+    $me = mysqli_fetch_assoc(mysqli_query($conn, $sql));
+
+    if (!$me || $me['role_name'] != 'Super Admin') {
+        header("Location: admin_dashboard.php");
+        exit();
+    }
+}
+
+// All roles (for the dropdown)
+$roles = mysqli_query($conn, "SELECT role_id, role_name FROM admin_roles ORDER BY role_id");
+
+$error = "";
+$success = "";
+$full_name = "";
+$username = "";
+$email = "";
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $full_name = trim($_POST['full_name']);
+    $username = trim($_POST['username']);
     $email = trim($_POST['email']);
-    $role_id = intval($_POST['role_id']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
-    if (empty($username) || empty($full_name) || empty($email) || empty($password) || empty($confirm_password)) {
-        $message = "All fields are required.";
-        $type = "danger";
+    // Validation
+    if ($full_name == "" || $username == "" || $email == "" || $password == "") {
+        $error = "All fields are required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Please enter a valid email address.";
+    } elseif (strlen($password) < 6) {
+        $error = "Password must be at least 6 characters.";
     } elseif ($password != $confirm_password) {
-        $message = "Passwords do not match.";
-        $type = "danger";
+        $error = "Passwords do not match.";
     } else {
-        $check_email = $conn->prepare("SELECT admin_id FROM admins WHERE email = ?");
-        $check_email->bind_param("s", $email);
-        $check_email->execute();
-        $check_email->store_result();
+        // Is the username or email already used?
+        $stmt = mysqli_prepare($conn, "SELECT admin_id FROM admins WHERE username = ? OR email = ?");
+        mysqli_stmt_bind_param($stmt, "ss", $username, $email);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_store_result($stmt);
 
-        if ($check_email->num_rows > 0) {
-            $message = "Email already registered.";
-            $type = "danger";
-        } else {
-            $check_username = $conn->prepare("SELECT admin_id FROM admins WHERE username = ?");
-            $check_username->bind_param("s", $username);
-            $check_username->execute();
-            $check_username->store_result();
-
-            if ($check_username->num_rows > 0) {
-                $message = "Username already exists.";
-                $type = "danger";
-            } else {
-                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-                $stmt = $conn->prepare("INSERT INTO admins (username, password, full_name, email, role_id, created_at) VALUES (?, ?, ?, ?, ?, NOW())");
-                $stmt->bind_param("ssssi", $username, $hashed_password, $full_name, $email, $role_id);
-
-                if ($stmt->execute()) {
-                    header("Location: admin_login.php");
-                    exit();
-                } else {
-                    $message = "Registration failed. Please try again.";
-                    $type = "danger";
-                }
-                $stmt->close();
-            }
-            $check_username->close();
+        if (mysqli_stmt_num_rows($stmt) > 0) {
+            $error = "That username or email is already used.";
         }
-        $check_email->close();
+    }
+
+    // Choose the role
+    $role_id = 0;
+    if ($error == "") {
+        if ($is_first_admin) {
+            $row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT role_id FROM admin_roles WHERE role_name = 'Super Admin'"));
+            if ($row) {
+                $role_id = $row['role_id'];
+            } else {
+                $error = "Role 'Super Admin' not found. Run admin_setup.sql first.";
+            }
+        } else {
+            $role_id = (int) $_POST['role_id'];
+            $row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT role_id FROM admin_roles WHERE role_id = $role_id"));
+            if (!$row) {
+                $error = "Please choose a valid role.";
+            }
+        }
+    }
+
+    // Save
+    if ($error == "") {
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        $stmt = mysqli_prepare($conn, "INSERT INTO admins (username, password, full_name, email, role_id)
+                                       VALUES (?, ?, ?, ?, ?)");
+        mysqli_stmt_bind_param($stmt, "ssssi", $username, $hashed_password, $full_name, $email, $role_id);
+
+        if (mysqli_stmt_execute($stmt)) {
+            $success = "Admin account created.";
+            $full_name = "";
+            $username = "";
+            $email = "";
+        } else {
+            $error = "Could not create the account. Please try again.";
+        }
     }
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Register - Room Booking System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f0f2f5;
-            font-family: Arial, sans-serif;
-        }
-        .register-box {
-            width: 100%;
-            max-width: 450px;
-            margin: 50px auto;
-            padding: 20px;
-        }
-        .card {
-            border: none;
-            padding: 20px;
-        }
-        h3 {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-        .form-label {
-            font-size: 14px;
-        }
-        p {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Admin Register - Room Booking System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="admin.css">
 </head>
 <body>
 
-<div class="register-box">
-    <div class="card shadow-sm">
-        <h3>Room Booking System</h3>
-        <h5 class="text-center mb-3">Admin Register</h5>
+<div class="container">
+    <div class="auth-box box">
 
-        <?php if ($message != "") { ?>
-            <div class="alert alert-<?php echo $type; ?> alert-dismissible fade show" role="alert">
-                <?php echo $message; ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+        <h1 class="page-title mb-3"><?php echo $is_first_admin ? 'Create First Admin' : 'Add Admin'; ?></h1>
+
+        <?php if ($error != "") { ?>
+            <div class="alert alert-danger"><?php echo htmlspecialchars($error); ?></div>
         <?php } ?>
 
-        <form method="POST" action="admin_register.php" onsubmit="return validateForm()">
+        <?php if ($success != "") { ?>
+            <div class="alert alert-secondary"><?php echo htmlspecialchars($success); ?></div>
+        <?php } ?>
+
+        <form method="POST" action="admin_register.php">
             <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text"
-                       class="form-control"
-                       id="username"
-                       name="username"
-                       placeholder="Enter username">
+                <label class="form-label" for="full_name">Full Name</label>
+                <input type="text" class="form-control" id="full_name" name="full_name"
+                       value="<?php echo htmlspecialchars($full_name); ?>" required>
             </div>
 
             <div class="mb-3">
-                <label for="full_name" class="form-label">Full Name</label>
-                <input type="text"
-                       class="form-control"
-                       id="full_name"
-                       name="full_name"
-                       placeholder="Enter full name">
+                <label class="form-label" for="username">Username</label>
+                <input type="text" class="form-control" id="username" name="username"
+                       value="<?php echo htmlspecialchars($username); ?>" required>
             </div>
 
             <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="text"
-                       class="form-control"
-                       id="email"
-                       name="email"
-                       placeholder="Enter email">
+                <label class="form-label" for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email"
+                       value="<?php echo htmlspecialchars($email); ?>" required>
             </div>
 
             <div class="mb-3">
-                <label for="role_id" class="form-label">Role ID</label>
-                <input type="number"
-                       class="form-control"
-                       id="role_id"
-                       name="role_id"
-                       placeholder="Enter role ID"
-                       min="1">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
             </div>
 
             <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password"
-                       class="form-control"
-                       id="password"
-                       name="password"
-                       placeholder="Enter password (min 6 characters)">
+                <label class="form-label" for="confirm_password">Confirm Password</label>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
             </div>
 
-            <div class="mb-3">
-                <label for="confirm_password" class="form-label">Confirm Password</label>
-                <input type="password"
-                       class="form-control"
-                       id="confirm_password"
-                       name="confirm_password"
-                       placeholder="Confirm password">
-            </div>
+            <?php if (!$is_first_admin) { ?>
+                <div class="mb-3">
+                    <label class="form-label" for="role_id">Role</label>
+                    <select class="form-select" id="role_id" name="role_id">
+                        <?php while ($role = mysqli_fetch_assoc($roles)) { ?>
+                            <option value="<?php echo (int) $role['role_id']; ?>">
+                                <?php echo htmlspecialchars($role['role_name']); ?>
+                            </option>
+                        <?php } ?>
+                    </select>
+                </div>
+            <?php } ?>
 
-            <button type="submit" class="btn btn-primary w-100">
-                Register
-            </button>
+            <button type="submit" class="btn btn-dark w-100">Register</button>
         </form>
 
-        <p>
-            Already have an admin account?
-            <a href="admin_login.php">Login</a>
+        <p class="mt-3 mb-0">
+            <?php if ($is_first_admin) { ?>
+                <a href="admin_login.php" class="text-dark">Go to login</a>
+            <?php } else { ?>
+                <a href="manage_admins.php" class="text-dark">&larr; Back to Admins</a>
+            <?php } ?>
         </p>
+
     </div>
 </div>
 
-<script>
-function validateForm() {
-    var username = document.getElementById("username").value.trim();
-    var fullName = document.getElementById("full_name").value.trim();
-    var email = document.getElementById("email").value.trim();
-    var roleId = document.getElementById("role_id").value.trim();
-    var password = document.getElementById("password").value;
-    var confirmPassword = document.getElementById("confirm_password").value;
-
-    var usernamePattern = /^[A-Za-z0-9_]+$/;
-    var namePattern = /^[A-Za-z ]+$/;
-    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    var passwordPattern = /^.{6,}$/;
-
-    if (username == "") {
-        alert("Please enter your username");
-        return false;
-    }
-
-    if (!usernamePattern.test(username)) {
-        alert("Username should contain only letters, numbers, and underscores");
-        return false;
-    }
-
-    if (fullName == "") {
-        alert("Please enter your full name");
-        return false;
-    }
-
-    if (!namePattern.test(fullName)) {
-        alert("Full name should contain only letters and spaces");
-        return false;
-    }
-
-    if (email == "") {
-        alert("Please enter your email");
-        return false;
-    }
-
-    if (!emailPattern.test(email)) {
-        alert("Please enter a valid email");
-        return false;
-    }
-
-    if (roleId == "" || roleId < 1) {
-        alert("Please enter a valid role ID");
-        return false;
-    }
-
-    if (password == "") {
-        alert("Please enter your password");
-        return false;
-    }
-
-    if (!passwordPattern.test(password)) {
-        alert("Password must be at least 6 characters");
-        return false;
-    }
-
-    if (confirmPassword == "") {
-        alert("Please confirm your password");
-        return false;
-    }
-
-    if (password != confirmPassword) {
-        alert("Passwords do not match");
-        return false;
-    }
-
-    return true;
-}
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<?php $base = "../"; include "../Footer.php"; ?>
 </body>
 </html>

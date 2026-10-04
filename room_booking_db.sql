@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 02, 2026 at 02:12 PM
+-- Generation Time: Oct 04, 2026 at 03:07 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -37,6 +37,14 @@ CREATE TABLE `admins` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `admins`
+--
+
+INSERT INTO `admins` (`admin_id`, `username`, `password`, `full_name`, `email`, `role_id`, `created_at`) VALUES
+(2, 'Main_Admin', '$2y$10$6LtRLiXEjHGpQkqcCVaKquCZO1vgC9ukv13vMLM/4K8YfuUgNbYVG', 'Test', 'Test123@gmail.com', 1, '2026-10-03 13:30:19'),
+(3, 'Test Admin', '$2y$10$whZLTYaCiIf9lqXAyInqguf45jLF/i5Io4LQZfQfPoZo7N1c5MwRa', 'New Test Admin', '123@gmail.com', 2, '2026-10-04 10:29:02');
+
 -- --------------------------------------------------------
 
 --
@@ -48,6 +56,14 @@ CREATE TABLE `admin_roles` (
   `role_name` varchar(50) NOT NULL,
   `description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admin_roles`
+--
+
+INSERT INTO `admin_roles` (`role_id`, `role_name`, `description`) VALUES
+(1, 'Super Admin', 'Full access'),
+(2, 'Manager', 'Rooms and bookings only');
 
 -- --------------------------------------------------------
 
@@ -71,6 +87,36 @@ CREATE TABLE `bookings` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `bookings`
+--
+
+INSERT INTO `bookings` (`booking_id`, `user_id`, `room_id`, `booking_date`, `start_time`, `end_time`, `check_in_date`, `check_out_date`, `guests`, `total_price`, `purpose`, `booking_status`, `created_at`) VALUES
+(1, 1, 2, '2026-10-09', '14:00:00', '11:00:00', '2026-10-09', '2026-10-17', 1, 24000.00, 'Nothing', 'Cancelled', '2026-10-02 12:19:29');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `contact_messages`
+--
+
+CREATE TABLE `contact_messages` (
+  `message_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `full_name` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `subject` varchar(100) NOT NULL,
+  `message` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `contact_messages`
+--
+
+INSERT INTO `contact_messages` (`message_id`, `user_id`, `full_name`, `email`, `subject`, `message`, `created_at`) VALUES
+(1, 1, 'Sushant Karki', 'whatgraza@gmail.com', 'Test', 'This is a test Message for Research', '2026-10-04 13:01:47');
+
 -- --------------------------------------------------------
 
 --
@@ -83,6 +129,16 @@ CREATE TABLE `privileges` (
   `description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `privileges`
+--
+
+INSERT INTO `privileges` (`privilege_id`, `privilege_name`, `description`) VALUES
+(1, 'manage_rooms', 'Add, edit, delete rooms'),
+(2, 'manage_bookings', 'Approve or cancel bookings'),
+(3, 'manage_users', 'View and delete users'),
+(4, 'manage_admins', 'Manage other admins');
+
 -- --------------------------------------------------------
 
 --
@@ -93,6 +149,18 @@ CREATE TABLE `role_privileges` (
   `role_id` int(11) NOT NULL,
   `privilege_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `role_privileges`
+--
+
+INSERT INTO `role_privileges` (`role_id`, `privilege_id`) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(1, 4),
+(2, 1),
+(2, 2);
 
 -- --------------------------------------------------------
 
@@ -119,15 +187,16 @@ CREATE TABLE `rooms` (
 
 INSERT INTO `rooms` (`room_id`, `room_name`, `room_type`, `capacity`, `price_per_night`, `location`, `description`, `image`, `status`, `created_at`) VALUES
 (1, 'Classic 2 Beds', 'Classic', 2, 3000.00, 'Kathmandu', 'Comfortable room with two beds and basic facilities.', 'classic_2beds.jpg', 'Available', '2026-10-01 10:46:16'),
-(2, 'Deluxe 1 Bed', 'Deluxe', 2, 3000.00, 'Kathmandu', 'Spacious deluxe room with a comfortable king-size bed.', 'deluxe_1bed.jpg', 'Available', '2026-10-01 11:10:54'),
+(2, 'Deluxe 1 Bed', 'Deluxe', 2, 3000.00, 'Kathmandu', 'Spacious deluxe room with a comfortable king-size bed.', 'deluxe_1bed.jpg', 'Maintenance', '2026-10-01 11:10:54'),
 (3, 'Family 3 Beds', 'Family', 3, 3000.00, 'Lalitpur', 'Large family room with three beds and additional space.', 'family_3beds.jpg', 'Available', '2026-10-01 11:10:54'),
 (4, 'Premium 2 Beds', 'Premium', 2, 3000.00, 'Bhaktapur', 'Premium room with modern facilities and two beds.', 'premium_2beds.jpg', 'Available', '2026-10-01 11:10:54'),
 (5, 'Standard 1 Bed', 'Standard', 1, 3000.00, 'Kathmandu', 'Simple and comfortable room suitable for a single guest.', 'standard_1bed.jpg', 'Available', '2026-10-01 11:16:20'),
 (6, 'Deluxe 2 Beds', 'Deluxe', 2, 3000.00, 'Lalitpur', 'Spacious deluxe room with two comfortable beds and modern facilities.', 'deluxe_2beds.jpg', 'Available', '2026-10-01 11:16:20'),
 (7, 'Family 4 Beds', 'Family', 4, 3000.00, 'Bhaktapur', 'Large family room with four beds and plenty of space for guests.', 'family_4beds.jpg', 'Available', '2026-10-01 11:16:20'),
 (8, 'Premium 1 Bed', 'Premium', 2, 3000.00, 'Kathmandu', 'Elegant premium room with a large bed and modern amenities.', 'premium_1bed.jpg', 'Available', '2026-10-01 11:16:20'),
-(9, 'Executive 2 Beds', 'Executive', 2, 3000.00, 'Lalitpur', 'Modern executive room with two beds and a comfortable working area.', 'executive_2beds.jpg', 'Booked', '2026-10-01 11:16:20'),
-(10, 'Luxury 1 Bed', 'Luxury', 2, 3000.00, 'Bhaktapur', 'Luxury room with a spacious bed, stylish interior and premium facilities.', 'luxury_1bed.jpg', 'Available', '2026-10-01 11:16:20');
+(9, 'Executive 2 Beds', 'Executive', 2, 3000.00, 'Lalitpur', 'Modern executive room with two beds and a comfortable working area.', 'executive_2beds.jpg', 'Available', '2026-10-01 11:16:20'),
+(10, 'Luxury 1 Bed', 'Luxury', 2, 3000.00, 'Bhaktapur', 'Luxury room with a spacious bed, stylish interior and premium facilities.', 'luxury_1bed.jpg', 'Available', '2026-10-01 11:16:20'),
+(11, 'Deluxe 1 Bed', 'Deluxe', 1, 2500.00, 'Nagarkot', '1 King Size Bed\r\nPrivate Bathroom\r\nFree Wi-Fi\r\nAir Conditioning\r\nTV\r\nWardrobe\r\nWork Desk\r\nBalcony/Window View', 'room_1791110078_3209.jpg', 'Available', '2026-10-04 10:34:38');
 
 -- --------------------------------------------------------
 
@@ -180,6 +249,13 @@ ALTER TABLE `bookings`
   ADD KEY `room_id` (`room_id`);
 
 --
+-- Indexes for table `contact_messages`
+--
+ALTER TABLE `contact_messages`
+  ADD PRIMARY KEY (`message_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `privileges`
 --
 ALTER TABLE `privileges`
@@ -214,31 +290,37 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `admins`
 --
 ALTER TABLE `admins`
-  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `admin_roles`
 --
 ALTER TABLE `admin_roles`
-  MODIFY `role_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `role_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `contact_messages`
+--
+ALTER TABLE `contact_messages`
+  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `privileges`
 --
 ALTER TABLE `privileges`
-  MODIFY `privilege_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `privilege_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `rooms`
 --
 ALTER TABLE `rooms`
-  MODIFY `room_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `room_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -262,6 +344,12 @@ ALTER TABLE `admins`
 ALTER TABLE `bookings`
   ADD CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `bookings_ibfk_2` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`room_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `contact_messages`
+--
+ALTER TABLE `contact_messages`
+  ADD CONSTRAINT `contact_messages_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `role_privileges`
