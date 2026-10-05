@@ -13,7 +13,6 @@ $user_name = $_SESSION['full_name'];
 
 $upload_msg = "";
 
-/* Get account creation date */
 $sql = "SELECT created_at FROM users WHERE user_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
@@ -27,7 +26,6 @@ $account_created = date("m/d/Y", strtotime($user['created_at']));
 $stmt->close();
 
 
-/* Profile picture upload (JPG or PNG, max 2 MB) */
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['profile_pic'])) {
 
     $upload_folder = "uploads/";
@@ -40,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['profile_pic'])) {
     $image_info = false;
 
     if ($_FILES['profile_pic']['error'] == 0) {
-        $image_info = @getimagesize($tmp_file);   // false if it is not a real image
+        $image_info = @getimagesize($tmp_file);
     }
 
     if ($_FILES['profile_pic']['error'] != 0) {
@@ -64,7 +62,6 @@ $profile_pic = "uploads/user_" . $user_id . ".jpg";
 $has_profile_pic = file_exists($profile_pic);
 
 
-/* Upcoming bookings */
 $sql = "SELECT r.room_name, b.booking_status,
                COALESCE(b.check_in_date, b.booking_date) AS stay_date
         FROM bookings b
@@ -84,7 +81,6 @@ $upcoming_result = $stmt->get_result();
 $stmt->close();
 
 
-/* Booking history */
 $sql = "SELECT r.room_name, b.booking_status,
                COALESCE(b.check_in_date, b.booking_date) AS stay_date
         FROM bookings b
@@ -104,7 +100,6 @@ $history_result = $stmt2->get_result();
 $stmt2->close();
 
 
-/* Total bookings */
 $sql = "SELECT COUNT(*) AS total
         FROM bookings
         WHERE user_id = ?";
@@ -119,7 +114,6 @@ $total_bookings = $count_result->fetch_assoc()['total'];
 $stmt4->close();
 
 
-/* Convert booking date to simple text */
 function timeAgo($date)
 {
     $difference = time() - strtotime($date);
@@ -153,18 +147,15 @@ function timeAgo($date)
 
     <title>User Profile - Room Booking System</title>
 
-    <!-- Same Bootstrap version as index.php -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-        /* ---------- Basic Page (same as index.php) ---------- */
         body {
             font-family: Arial, sans-serif;
             background: #f8f9fa;
             color: #212529;
         }
 
-        /* ---------- Profile cards (same box style as index.php .search-form-box) ---------- */
         .card {
             background: #fff;
             border: 1px solid #ddd;
@@ -184,7 +175,6 @@ function timeAgo($date)
             color: #555;
         }
 
-        /* ---------- Profile picture ---------- */
         .profile-avatar,
         .profile-pic-img {
             width: 100px;
@@ -228,7 +218,6 @@ function timeAgo($date)
             color: #333;
         }
 
-        /* ---------- Info rows ---------- */
         .section-heading {
             font-size: 12px;
             color: #888;
@@ -250,7 +239,6 @@ function timeAgo($date)
             color: #333;
         }
 
-        /* ---------- Notification box ---------- */
         .notification-box {
             background-color: #f1f3f5;
             padding: 12px;
@@ -269,7 +257,6 @@ function timeAgo($date)
             color: #212529;
         }
 
-        /* ---------- Booking items ---------- */
         .booking-item {
             background-color: #f8f9fa;
             border: 1px solid #eee;
@@ -286,7 +273,6 @@ function timeAgo($date)
             font-size: 12px;
         }
 
-        /* ---------- History ---------- */
         .history-item {
             padding: 10px;
             border-bottom: 1px solid #eee;
@@ -303,7 +289,6 @@ function timeAgo($date)
             font-size: 14px;
         }
 
-        /* ---------- Footer (same as index.php) ---------- */
         footer {
             margin-top: 40px;
             padding: 20px 0;
@@ -315,239 +300,236 @@ function timeAgo($date)
 </head>
 
 <body>
-<?php include "header.php"; ?>
+    <?php include "header.php"; ?>
 
 
-<div class="container py-4">
+    <div class="container py-4">
 
-    <div class="row">
+        <div class="row">
 
-        <!-- Left Sidebar -->
-        <div class="col-md-3">
+            <div class="col-md-3">
 
-            <div class="card">
+                <div class="card">
 
-                <div class="card-body text-center">
+                    <div class="card-body text-center">
 
-                    <?php if ($has_profile_pic) { ?>
+                        <?php if ($has_profile_pic) { ?>
 
-                        <img src="<?php echo $profile_pic; ?>?t=<?php echo time(); ?>"
-                             class="profile-pic-img"
-                             alt="Profile">
+                            <img src="<?php echo $profile_pic; ?>?t=<?php echo time(); ?>"
+                                class="profile-pic-img"
+                                alt="Profile">
 
-                    <?php } else { ?>
+                        <?php } else { ?>
 
-                        <div class="profile-avatar">
-                            <?php
-                            $name_parts = explode(" ", $user_name);
-                            echo strtoupper(substr($name_parts[0], 0, 1));
-                            ?>
-                        </div>
-
-                    <?php } ?>
-
-                    <div class="change-photo">
-
-                        <form method="POST" enctype="multipart/form-data">
-
-                            <input type="file"
-                                   name="profile_pic"
-                                   id="profile_pic"
-                                   style="display:none;"
-                                   onchange="this.form.submit();">
-
-                            <label for="profile_pic">
-                                &#128247; Change Photo
-                            </label>
-
-                        </form>
-
-                        <?php if ($upload_msg != "") { ?>
-
-                            <small class="text-success">
-                                <?php echo $upload_msg; ?>
-                            </small>
-
-                        <?php } ?>
-
-                    </div>
-
-                    <div class="profile-name">
-                        <?php echo htmlspecialchars($user_name); ?>
-                    </div>
-
-                    <div class="text-start" style="margin-top:20px;">
-
-                        <p class="section-heading">
-                            Account info:
-                        </p>
-
-                        <div class="info-row">
-
-                            <span class="info-label">
-                                Account Created
-                            </span>
-
-                            <span class="info-value">
-                                <?php echo $account_created; ?>
-                            </span>
-
-                        </div>
-
-                        <div class="info-row">
-
-                            <span class="info-label">
-                                User ID
-                            </span>
-
-                            <span class="info-value">
-                                <?php echo $user_id; ?>
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                    <div class="notification-box text-start">
-
-                        <p>
-                            <strong>
-                                Welcome back!
-                            </strong>
-                        </p>
-
-                        <p style="margin-top:5px;">
-                            You have <?php echo $total_bookings; ?> total
-                            booking(s). Manage your room bookings from this panel.
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- Center Content -->
-        <div class="col-md-9">
-
-            <!-- Upcoming Bookings -->
-            <div class="card">
-
-                <div class="card-body">
-
-                    <h6 class="card-title">
-                        Upcoming bookings
-                        <a href="my_bookings.php" class="float-end small">View all</a>
-                    </h6>
-
-                    <?php if ($upcoming_result->num_rows > 0) { ?>
-
-                        <?php while ($row = $upcoming_result->fetch_assoc()) { ?>
-
-                            <?php
-                            $display_name = $row['room_name'];
-
-                            $date = date(
-                                "M j",
-                                strtotime($row['stay_date'])
-                            );
-                            ?>
-
-                            <div class="booking-item">
-
-                                <span>
-                                    &#128205;
-                                    <?php echo htmlspecialchars($display_name); ?>
-                                </span>
-
-                                <span class="booking-date">
-                                    <?php echo $date; ?> &middot; <?php echo htmlspecialchars($row['booking_status']); ?>
-                                </span>
-
+                            <div class="profile-avatar">
+                                <?php
+                                $name_parts = explode(" ", $user_name);
+                                echo strtoupper(substr($name_parts[0], 0, 1));
+                                ?>
                             </div>
 
                         <?php } ?>
 
-                    <?php } else { ?>
+                        <div class="change-photo">
 
-                        <div class="empty-msg">
-                            No upcoming bookings
-                        </div>
+                            <form method="POST" enctype="multipart/form-data">
 
-                    <?php } ?>
+                                <input type="file"
+                                    name="profile_pic"
+                                    id="profile_pic"
+                                    style="display:none;"
+                                    onchange="this.form.submit();">
 
-                </div>
+                                <label for="profile_pic">
+                                    &#128247; Change Photo
+                                </label>
 
-            </div>
+                            </form>
 
+                            <?php if ($upload_msg != "") { ?>
 
-            <!-- Booking History -->
-            <div class="card">
-
-                <div class="card-body">
-
-                    <h6 class="card-title">
-                        Booking history
-                    </h6>
-
-                    <?php if ($history_result->num_rows > 0) { ?>
-
-                        <?php while ($row = $history_result->fetch_assoc()) { ?>
-
-                            <?php
-                            $display_name = $row['room_name'];
-
-                            $ago = ($row['booking_status'] == 'Cancelled') ? 'Cancelled' : timeAgo($row['stay_date']);
-                            ?>
-
-                            <div class="history-item">
-
-                                <span>
-                                    &#128336;
-                                    <?php echo htmlspecialchars($display_name); ?>
-                                </span>
-
-                                <span class="history-arrow">
-                                    &#8250;
-                                </span>
-
-                                <br>
-
-                                <small class="text-muted">
-                                    <?php echo $ago; ?>
+                                <small class="text-success">
+                                    <?php echo $upload_msg; ?>
                                 </small>
 
-                            </div>
+                            <?php } ?>
 
-                        <?php } ?>
-
-                    <?php } else { ?>
-
-                        <div class="empty-msg">
-                            No booking history
                         </div>
 
-                    <?php } ?>
+                        <div class="profile-name">
+                            <?php echo htmlspecialchars($user_name); ?>
+                        </div>
+
+                        <div class="text-start" style="margin-top:20px;">
+
+                            <p class="section-heading">
+                                Account info:
+                            </p>
+
+                            <div class="info-row">
+
+                                <span class="info-label">
+                                    Account Created
+                                </span>
+
+                                <span class="info-value">
+                                    <?php echo $account_created; ?>
+                                </span>
+
+                            </div>
+
+                            <div class="info-row">
+
+                                <span class="info-label">
+                                    User ID
+                                </span>
+
+                                <span class="info-value">
+                                    <?php echo $user_id; ?>
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="notification-box text-start">
+
+                            <p>
+                                <strong>
+                                    Welcome back!
+                                </strong>
+                            </p>
+
+                            <p style="margin-top:5px;">
+                                You have <?php echo $total_bookings; ?> total
+                                booking(s). Manage your room bookings from this panel.
+                            </p>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
             </div>
 
+
+            <div class="col-md-9">
+
+                <div class="card">
+
+                    <div class="card-body">
+
+                        <h6 class="card-title">
+                            Upcoming bookings
+                            <a href="my_bookings.php" class="float-end small">View all</a>
+                        </h6>
+
+                        <?php if ($upcoming_result->num_rows > 0) { ?>
+
+                            <?php while ($row = $upcoming_result->fetch_assoc()) { ?>
+
+                                <?php
+                                $display_name = $row['room_name'];
+
+                                $date = date(
+                                    "M j",
+                                    strtotime($row['stay_date'])
+                                );
+                                ?>
+
+                                <div class="booking-item">
+
+                                    <span>
+                                        &#128205;
+                                        <?php echo htmlspecialchars($display_name); ?>
+                                    </span>
+
+                                    <span class="booking-date">
+                                        <?php echo $date; ?> &middot; <?php echo htmlspecialchars($row['booking_status']); ?>
+                                    </span>
+
+                                </div>
+
+                            <?php } ?>
+
+                        <?php } else { ?>
+
+                            <div class="empty-msg">
+                                No upcoming bookings
+                            </div>
+
+                        <?php } ?>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-body">
+
+                        <h6 class="card-title">
+                            Booking history
+                        </h6>
+
+                        <?php if ($history_result->num_rows > 0) { ?>
+
+                            <?php while ($row = $history_result->fetch_assoc()) { ?>
+
+                                <?php
+                                $display_name = $row['room_name'];
+
+                                $ago = ($row['booking_status'] == 'Cancelled') ? 'Cancelled' : timeAgo($row['stay_date']);
+                                ?>
+
+                                <div class="history-item">
+
+                                    <span>
+                                        &#128336;
+                                        <?php echo htmlspecialchars($display_name); ?>
+                                    </span>
+
+                                    <span class="history-arrow">
+                                        &#8250;
+                                    </span>
+
+                                    <br>
+
+                                    <small class="text-muted">
+                                        <?php echo $ago; ?>
+                                    </small>
+
+                                </div>
+
+                            <?php } ?>
+
+                        <?php } else { ?>
+
+                            <div class="empty-msg">
+                                No booking history
+                            </div>
+
+                        <?php } ?>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+
         </div>
-
-
-
 
     </div>
 
-</div>
+    <?php include "Footer.php"; ?>
 
-<?php include "Footer.php"; ?>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
+
 </html>

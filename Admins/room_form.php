@@ -1,8 +1,7 @@
 <?php
 include "admin_header.php";
 
-// room_form.php?room_id=5  -> EDIT room 5
-// room_form.php            -> ADD new room
+
 $room_id = 0;
 if (isset($_GET['room_id'])) {
     $room_id = (int) $_GET['room_id'];
@@ -13,7 +12,6 @@ $is_edit = ($room_id > 0);
 
 $statuses = ['Available', 'Booked', 'Maintenance'];
 
-// Empty values for the "add" form
 $room = [
     'room_name'       => '',
     'room_type'       => '',
@@ -26,7 +24,6 @@ $room = [
 $old_image = "";
 $errors = [];
 
-// Editing: load the room from the database
 if ($is_edit) {
     $stmt = mysqli_prepare($conn, "SELECT * FROM rooms WHERE room_id = ?");
     mysqli_stmt_bind_param($stmt, "i", $room_id);
@@ -42,7 +39,6 @@ if ($is_edit) {
     $old_image = (string) $found['image'];
 }
 
-// Form submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $room['room_name']       = trim($_POST['room_name']);
@@ -53,7 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $room['description']     = trim($_POST['description']);
     $room['status']          = $_POST['status'];
 
-    // Validation
     if ($room['room_name'] == '') {
         $errors[] = "Room name is required.";
     }
@@ -67,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $errors[] = "Please choose a valid status.";
     }
 
-    // Image upload (optional) - keep the old image unless a new one is uploaded
     $image_name = $old_image;
 
     if ($_FILES['image']['error'] != UPLOAD_ERR_NO_FILE) {
@@ -84,7 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             } elseif (@getimagesize($_FILES['image']['tmp_name']) === false) {
                 $errors[] = "The uploaded file is not a real image.";
             } else {
-                // Unique file name so old images are not overwritten
                 $new_name = "room_" . time() . "_" . rand(1000, 9999) . "." . $ext;
 
                 if (move_uploaded_file($_FILES['image']['tmp_name'], "../images/" . $new_name)) {
@@ -96,7 +89,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Save to the database
     if (empty($errors)) {
 
         $price = (float) $room['price_per_night'];
@@ -221,7 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </form>
 </div>
 
-</div><!-- end .page-content -->
+</div>
 
 <?php $base = "../"; include "../Footer.php"; ?>
 </body>

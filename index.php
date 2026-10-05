@@ -1,23 +1,18 @@
 <?php
-// Start the session FIRST (before any HTML) so header.php can see $_SESSION['user_id']
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// index.php - homepage
-// Shows: hero, search, popular destinations, rooms from the database,
-//        features, newsletter CTA, footer.
+
 
 include "dbconnection.php";
 
-// Total rooms (for the hero subtitle)
 $room_count = 0;
 $count_res = $conn->query("SELECT COUNT(*) FROM rooms");
 if ($count_res) {
     $room_count = (int) $count_res->fetch_row()[0];
 }
 
-// A few rooms for the "Rooms loved by guests" section
 $popular_rooms = $conn->query(
     "SELECT room_id, room_name, room_type, capacity, location, image, status
      FROM rooms
@@ -37,9 +32,7 @@ $popular_rooms = $conn->query(
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
-/* =========================================================
-   BASIC PAGE
-   ========================================================= */
+
 body {
     font-family: Arial, sans-serif;
     background: #f5f5f5;
@@ -52,9 +45,7 @@ body {
     margin: 40px 0 18px;
 }
 
-/* =========================================================
-   HERO (Screenshot 1)
-   ========================================================= */
+
 .hero {
     min-height: 440px;
     background-color: #333333;   /* shown only if the image is missing */
@@ -68,7 +59,7 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 60px 20px 110px;   /* extra bottom space for the search bar */
+    padding: 60px 20px 110px;   
 }
 
 .hero h1 {
@@ -76,7 +67,6 @@ body {
     font-weight: bold;
 }
 
-/* soft shadow keeps the white text readable on bright parts of the photo */
 .hero h1,
 .hero .hero-sub,
 .hero .hero-count {
@@ -95,9 +85,7 @@ body {
     margin-bottom: 22px;
 }
 
-/* =========================================================
-   SEARCH BAR (Screenshot 1 - white bar overlapping the hero)
-   ========================================================= */
+
 .search-bar-card {
     background: #fff;
     border-radius: 12px;
@@ -115,7 +103,6 @@ body {
     margin-bottom: 2px;
 }
 
-/* inputs have no visible box, like in the screenshot */
 .search-bar-card .form-control {
     border: none;
     padding-left: 0;
@@ -124,13 +111,11 @@ body {
     background: transparent;
 }
 
-/* vertical divider between fields (desktop only) */
 .search-divider {
     border-left: 1px solid #e0e0e0;
     padding-left: 18px;
 }
 
-/* round blue arrow button */
 .search-circle-btn {
     width: 52px;
     height: 52px;
@@ -146,9 +131,7 @@ body {
     color: #fff;
 }
 
-/* =========================================================
-   POPULAR DESTINATIONS (Screenshots 1 + 2 - masonry grid)
-   ========================================================= */
+
 .dest-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -176,7 +159,6 @@ body {
     opacity: 0.9;
 }
 
-/* card that spans two rows (tall image) */
 .dest-tall {
     grid-row: span 2;
 }
@@ -193,9 +175,7 @@ body {
     border-radius: 20px;
 }
 
-/* =========================================================
-   ROOM CARDS (Screenshot 2 - "Hotels loved by guests")
-   ========================================================= */
+
 .room-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -227,7 +207,6 @@ body {
     display: block;
 }
 
-/* small status badge, top left */
 .room-badge {
     position: absolute;
     top: 10px;
@@ -241,7 +220,6 @@ body {
 .badge-available   { background: #d6f5d6; color: #1c6e1c; }
 .badge-unavailable { background: #eeeeee; color: #666666; }
 
-/* heart icon, top right (visual only) */
 .room-heart {
     position: absolute;
     top: 10px;
@@ -283,9 +261,7 @@ body {
     color: #0d6efd;
 }
 
-/* =========================================================
-   FEATURES ("Why book with us") - simple 3 icon cards
-   ========================================================= */
+
 .feature-card {
     background: #fff;
     border: 1px solid #e2e2e2;
@@ -317,9 +293,6 @@ body {
     margin: 0;
 }
 
-/* =========================================================
-   NEWSLETTER / CTA (Screenshot 2 - "Pssst!" band)
-   ========================================================= */
 .newsletter-box {
     background: #fff;
     border: 1px solid #e2e2e2;
@@ -366,9 +339,7 @@ body {
     color: #fff;
 }
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
+
 @media (max-width: 992px) {
     .room-grid {
         grid-template-columns: repeat(3, 1fr);
@@ -380,7 +351,6 @@ body {
         font-size: 30px;
     }
 
-    /* destinations: 2 columns, no tall cards */
     .dest-grid {
         grid-template-columns: repeat(2, 1fr);
         grid-auto-rows: 150px;
@@ -390,7 +360,6 @@ body {
         grid-row: span 1;
     }
 
-    /* search fields stack, dividers hidden, button full width */
     .search-divider {
         border-left: none;
         padding-left: 0;
@@ -413,7 +382,6 @@ body {
 
 <?php include "header.php"; ?>
 
-<!-- ============ HERO (from Screenshot 1) ============ -->
 <section class="hero">
     <div>
         <h1>Find a room<br>in seconds</h1>
@@ -422,15 +390,13 @@ body {
     </div>
 </section>
 
-<!-- ============ SEARCH BAR (from Screenshot 1) ============ -->
 <div class="container">
     <div class="search-bar-card">
         <form action="Search.php" method="GET" onsubmit="return validateSearchForm();">
 
             <div class="row g-3 align-items-center">
 
-                <!-- Search.php reads this value as "location"
-                     (it searches room name, room type and location) -->
+                
                 <div class="col-md-6">
                     <label for="location">Room name</label>
                     <input type="text" class="form-control" id="location"
@@ -456,7 +422,6 @@ body {
 
 <div class="container">
 
-    <!-- ============ POPULAR DESTINATIONS (Screenshots 1 + 2) ============ -->
     <h2 class="section-title">Popular destinations</h2>
 
     <div class="dest-grid">
@@ -493,7 +458,6 @@ body {
 
     </div>
 
-    <!-- ============ ROOMS LOVED BY GUESTS (from Screenshot 2) ============ -->
     <h2 class="section-title">Rooms loved by guests</h2>
 
     <?php if ($popular_rooms && $popular_rooms->num_rows > 0) { ?>
@@ -548,7 +512,6 @@ body {
 
     <?php } ?>
 
-    <!-- ============ WHY BOOK WITH US (extra info section) ============ -->
     <h2 class="section-title">Why book with us</h2>
 
     <div class="row g-3">
@@ -579,7 +542,6 @@ body {
 
     </div>
 
-    <!-- ============ NEWSLETTER CTA (from Screenshot 2) ============ -->
     <div class="newsletter-box">
 
         <div class="d-flex align-items-center">
@@ -604,7 +566,6 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-/* Simple search validation: guests must be at least 1 (if typed). */
 function validateSearchForm() {
     var guests = document.getElementById("guests").value;
 

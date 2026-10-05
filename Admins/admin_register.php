@@ -45,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
-    // Validation
     if ($full_name == "" || $username == "" || $email == "" || $password == "") {
         $error = "All fields are required.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -55,7 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif ($password != $confirm_password) {
         $error = "Passwords do not match.";
     } else {
-        // Is the username or email already used?
         $stmt = mysqli_prepare($conn, "SELECT admin_id FROM admins WHERE username = ? OR email = ?");
         mysqli_stmt_bind_param($stmt, "ss", $username, $email);
         mysqli_stmt_execute($stmt);
@@ -66,7 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Choose the role
     $role_id = 0;
     if ($error == "") {
         if ($is_first_admin) {
@@ -85,7 +82,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Save
     if ($error == "") {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 

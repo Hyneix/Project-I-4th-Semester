@@ -2,7 +2,6 @@
 session_start();
 include "../dbconnection.php";
 
-// Already logged in -> go to the dashboard
 if (isset($_SESSION['admin_id'])) {
     header("Location: admin_dashboard.php");
     exit();

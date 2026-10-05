@@ -1,8 +1,7 @@
 <?php
 include "admin_header.php";
 
-// Messages come from ContactUs.php (table: contact_messages)
-// How many messages to show: 10 at first, +10 each time "See More" is clicked
+
 $show = 10;
 if (isset($_GET['show'])) {
     $show = (int) $_GET['show'];
@@ -14,7 +13,6 @@ if ($show < 10) {
     $show = 10;
 }
 
-// Delete a message
 if (isset($_POST['delete_message'])) {
     $message_id = (int) $_POST['message_id'];
 
@@ -26,11 +24,9 @@ if (isset($_POST['delete_message'])) {
     exit();
 }
 
-// Total number of messages
 $result = mysqli_query($conn, "SELECT COUNT(*) FROM contact_messages");
 $total_messages = mysqli_fetch_row($result)[0];
 
-// Get the newest $show messages
 $stmt = mysqli_prepare($conn, "SELECT * FROM contact_messages ORDER BY message_id DESC LIMIT ?");
 mysqli_stmt_bind_param($stmt, "i", $show);
 mysqli_stmt_execute($stmt);
@@ -71,7 +67,6 @@ $messages = mysqli_stmt_get_result($stmt);
 
                 <td><?php echo htmlspecialchars($message['subject']); ?></td>
 
-                <!-- nl2br keeps the line breaks the user typed -->
                 <td style="min-width:260px; max-width:420px;">
                     <?php echo nl2br(htmlspecialchars($message['message'])); ?>
                 </td>
@@ -79,7 +74,6 @@ $messages = mysqli_stmt_get_result($stmt);
                 <td class="text-nowrap"><?php echo date('d M Y, h:i A', strtotime($message['created_at'])); ?></td>
 
                 <td class="text-nowrap">
-                    <!-- Opens the admin's email program with the sender's address filled in -->
                     <a href="mailto:<?php echo htmlspecialchars($message['email']); ?>?subject=<?php echo rawurlencode('Re: ' . $message['subject']); ?>"
                        class="btn btn-outline-dark btn-sm">Reply</a>
 
@@ -100,14 +94,13 @@ $messages = mysqli_stmt_get_result($stmt);
     </table>
 </div>
 
-<!-- See More: only shown when there are more messages -->
 <?php if ($total_messages > $show) { ?>
     <div id="more" class="text-center mt-4">
         <a href="manage_messages.php?show=<?php echo $show + 10; ?>#more" class="btn btn-dark px-4">See More</a>
     </div>
 <?php } ?>
 
-</div><!-- end .page-content -->
+</div>
 
 <?php $base = "../"; include "../Footer.php"; ?>
 </body>

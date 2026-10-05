@@ -1,14 +1,11 @@
 <?php
-// Search.php - search rooms from the rooms table
 
-// Start the session before any HTML is printed (header.php needs it)
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
 include "dbconnection.php";
 
-// Get search values
 if (isset($_GET['location'])) {
     $location = trim($_GET['location']);
 } else {
@@ -21,7 +18,6 @@ if (isset($_GET['guests'])) {
     $guests = 0;
 }
 
-// How many rooms to show (8 first, then 16, 24, ...)
 if (isset($_GET['limit'])) {
     $limit = (int) $_GET['limit'];
 } else {
@@ -31,14 +27,12 @@ if (isset($_GET['limit'])) {
 if ($limit < 8) {
     $limit = 8;
 }
-// Never load more than 200 rooms in one page (keeps the page fast)
-if ($limit > 200) {
-    $limit = 200;
+if ($limit > 100) {
+    $limit = 100;
 }
 
 $like = "%" . $location . "%";
 
-// Query 1: count matching rooms
 $sql = "SELECT COUNT(*) FROM rooms
         WHERE (? = '' OR room_name LIKE ? OR room_type LIKE ? OR location LIKE ?)
         AND capacity >= ?";
@@ -50,9 +44,7 @@ $row = $result->fetch_row();
 $total_rooms = (int) $row[0];
 $stmt->close();
 
-// Query 2: get only $limit rooms.
-// Only the columns shown on the page are selected, and the description
-// is cut to 150 characters because the card only shows a few lines.
+
 $sql = "SELECT room_id, room_name, room_type, capacity, price_per_night, location,
                LEFT(description, 150) AS description, image, status
         FROM rooms
@@ -65,7 +57,6 @@ $stmt->bind_param("ssssii", $location, $like, $like, $like, $guests, $limit);
 $stmt->execute();
 $rooms = $stmt->get_result();
 
-// Show More link (keeps the search values)
 $next_limit = $limit + 8;
 $show_more_link = "Search.php?location=" . urlencode($location)
                 . "&guests=" . $guests
@@ -88,7 +79,6 @@ body {
     color: #222222;
 }
 
-/* Search form box */
 .search-form-box {
     background-color: white;
     border: 1px solid #dddddd;
@@ -102,7 +92,6 @@ body {
     font-weight: bold;
 }
 
-/* Heading */
 .results-title {
     font-size: 18px;
     font-weight: bold;
@@ -116,7 +105,6 @@ body {
     color: #888888;
 }
 
-/* 4 room cards in one row (responsive) */
 .room-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -135,7 +123,6 @@ body {
     }
 }
 
-/* The whole card is a link */
 .room-link {
     display: block;
     color: black;
@@ -200,7 +187,6 @@ body {
     margin-top: 6px;
 }
 
-/* Green "Book Now" label (the whole card is the link) */
 .book-label {
     float: right;
     background-color: #2e7d32;
@@ -210,7 +196,6 @@ body {
     border-radius: 12px;
 }
 
-/* Monochrome status badges */
 .available {
     background-color: #eeeeee;
     color: #222222;
@@ -239,7 +224,6 @@ body {
 
 <div class="container">
 
-    <!-- Search form -->
     <div class="search-form-box">
         <form action="Search.php" method="GET">
             <div class="row g-3 align-items-end">
@@ -266,7 +250,6 @@ body {
         </form>
     </div>
 
-    <!-- Heading with total number of rooms -->
     <h2 class="results-title">
         Available Rooms
         <span class="total-text">
@@ -314,7 +297,6 @@ body {
 
         </div>
 
-        <!-- Show More button (only if more rooms are left) -->
         <?php if ($total_rooms > $limit) { ?>
             <div class="text-center mt-4">
                 <a href="<?php echo htmlspecialchars($show_more_link); ?>" class="btn btn-dark">Show More</a>

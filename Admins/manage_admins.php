@@ -1,7 +1,6 @@
 <?php
 include "admin_header.php";
 
-// Super Admin only ($is_super_admin is set in admin_header.php)
 if (!$is_super_admin) {
     ?>
     <div class="alert alert-danger">Unauthorized. Only a Super Admin can open this page.</div>
@@ -13,21 +12,18 @@ if (!$is_super_admin) {
     exit();
 }
 
-// Get all roles (for the dropdown and for checking the chosen role)
 $roles = [];
 $result = mysqli_query($conn, "SELECT role_id, role_name FROM admin_roles ORDER BY role_id");
 while ($role = mysqli_fetch_assoc($result)) {
     $roles[] = $role;
 }
 
-// Change role
 if (isset($_POST['change_role'])) {
 
     $change_id = (int) $_POST['admin_id'];
     $role_id = (int) $_POST['role_id'];
     $error = "";
 
-    // The role must exist
     $role_exists = false;
     foreach ($roles as $role) {
         if ($role['role_id'] == $role_id) {
@@ -36,7 +32,7 @@ if (isset($_POST['change_role'])) {
     }
 
     if ($change_id == $_SESSION['admin_id']) {
-        $error = "You cannot change your own role.";   // so the last Super Admin cannot lock everyone out
+        $error = "You cannot change your own role.";   
     } elseif (!$role_exists) {
         $error = "Invalid role.";
     } else {
@@ -53,7 +49,6 @@ if (isset($_POST['change_role'])) {
     exit();
 }
 
-// Get all admins with their role name (password is NOT selected)
 $admins = mysqli_query($conn, "SELECT admins.admin_id, admins.full_name, admins.username, admins.email,
                                       admins.role_id, admin_roles.role_name
                                FROM admins
@@ -112,7 +107,7 @@ $admins = mysqli_query($conn, "SELECT admins.admin_id, admins.full_name, admins.
     </table>
 </div>
 
-</div><!-- end .page-content -->
+</div>
 
 <?php $base = "../"; include "../Footer.php"; ?>
 </body>

@@ -1,7 +1,6 @@
 <?php
 include "admin_header.php";
 
-// How many rooms to show: 6 at first, +6 each time "See More" is clicked
 $show = 6;
 if (isset($_GET['show'])) {
     $show = (int) $_GET['show'];
@@ -25,11 +24,9 @@ if (isset($_POST['delete_room'])) {
     exit();
 }
 
-// Total number of rooms
 $result = mysqli_query($conn, "SELECT COUNT(*) FROM rooms");
 $total_rooms = mysqli_fetch_row($result)[0];
 
-// Get only the first $show rooms
 $stmt = mysqli_prepare($conn, "SELECT * FROM rooms ORDER BY room_id LIMIT ?");
 mysqli_stmt_bind_param($stmt, "i", $show);
 mysqli_stmt_execute($stmt);
@@ -71,7 +68,6 @@ $rooms = mysqli_stmt_get_result($stmt);
                         <span class="admin-room-id">#<?php echo (int) $room['room_id']; ?></span>
                     </div>
 
-                    <!-- Short description (first 90 characters) -->
                     <p class="admin-room-desc">
                         <?php
                         if (!empty($room['description'])) {
@@ -107,7 +103,6 @@ $rooms = mysqli_stmt_get_result($stmt);
 
     </div>
 
-    <!-- See More: only shown when there are more rooms -->
     <?php if ($total_rooms > $show) { ?>
         <div id="more" class="text-center mt-4">
             <a href="manage_rooms.php?show=<?php echo $show + 6; ?>#more" class="btn btn-dark px-4">See More</a>
@@ -118,7 +113,7 @@ $rooms = mysqli_stmt_get_result($stmt);
     <div class="box text-center text-muted">No rooms found.</div>
 <?php } ?>
 
-</div><!-- end .page-content -->
+</div>
 
 <?php $base = "../"; include "../Footer.php"; ?>
 </body>

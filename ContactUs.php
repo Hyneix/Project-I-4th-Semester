@@ -1,30 +1,23 @@
 <?php
-// ContactUs.php - support page: contact details + a message form
-// Messages are saved in the contact_messages table (see contact_messages.sql)
 
-// 1. Start the session BEFORE any HTML is printed (header.php needs it too)
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// 2. Database connection
 include "dbconnection.php";
 
 $error_message = "";
 $success_message = "";
 
-// Values shown in the form. If the user is logged in, name and email are filled in for them.
 $full_name = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : "";
 $email = isset($_SESSION['email']) ? $_SESSION['email'] : "";
 $subject = "";
 $message = "";
 
-// 3. Message shown after a successful send (see the redirect below)
 if (isset($_GET['success'])) {
     $success_message = "Thank you! Your message has been sent to our support team.";
 }
 
-// 4. Form submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $full_name = trim($_POST['full_name']);
@@ -32,7 +25,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $subject = trim($_POST['subject']);
     $message = trim($_POST['message']);
 
-    // --- Validation ---
     if ($full_name == "" || $email == "" || $subject == "" || $message == "") {
         $error_message = "All fields are required.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -43,7 +35,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error_message = "Message must be 2000 characters or less.";
     } else {
 
-        // Logged-in users are linked to their account, guests are saved without a user_id
         $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
         $stmt = $conn->prepare("INSERT INTO contact_messages (user_id, full_name, email, subject, message)
@@ -52,7 +43,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($stmt->execute()) {
             $stmt->close();
-            // Redirect so refreshing the page does not send the message twice
             header("Location: ContactUs.php?success=1");
             exit();
         } else {
@@ -73,9 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 
 <style>
-/* =========================================================
-   BASIC PAGE (same as index.php)
-   ========================================================= */
+
 body {
     font-family: Arial, sans-serif;
     background: #f5f5f5;
@@ -94,9 +82,7 @@ body {
     margin-bottom: 20px;
 }
 
-/* =========================================================
-   WHITE CARDS (same look as the cards on index.php)
-   ========================================================= */
+
 .card-box {
     background: #fff;
     border: 1px solid #e2e2e2;
@@ -116,7 +102,6 @@ body {
     font-weight: bold;
 }
 
-/* Contact details (label on top, value below) */
 .contact-item {
     padding: 10px 0;
     border-top: 1px solid #eeeeee;
@@ -133,7 +118,6 @@ body {
     color: #777777;
 }
 
-/* Page bottom space */
 .page-bottom {
     padding-bottom: 20px;
 }
@@ -159,7 +143,6 @@ body {
 
     <div class="row g-4">
 
-        <!-- LEFT: message form -->
         <div class="col-lg-8">
             <div class="card-box">
                 <h2>Send us a message</h2>
@@ -200,7 +183,6 @@ body {
             </div>
         </div>
 
-        <!-- RIGHT: contact details (same details as the footer) -->
         <div class="col-lg-4">
             <div class="card-box">
                 <h2>Contact Information</h2>
@@ -227,7 +209,6 @@ body {
 </div>
 
 <script>
-// Simple form check before sending (same style as register.php)
 function validateForm() {
     var name = document.getElementById("full_name").value.trim();
     var email = document.getElementById("email").value.trim();

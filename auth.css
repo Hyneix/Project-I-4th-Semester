@@ -1,9 +1,4 @@
-/* =========================================================
-   auth.css - design for login.php and register.php
-   ========================================================= */
 
-/* Background */
-/* To change the background, replace images/room-background.jpg */
 body {
     font-family: Arial, sans-serif;
     color: #111827;
@@ -13,7 +8,6 @@ body {
     background-repeat: no-repeat;
 }
 
-/* Logo (top left) */
 .logo {
     position: absolute;
     top: 20px;
@@ -37,7 +31,6 @@ body {
     border-radius: 8px;
 }
 
-/* Page container: centers the card on the screen */
 .login-container {
     position: relative;
     min-height: 100vh;
@@ -48,7 +41,6 @@ body {
     overflow: hidden;
 }
 
-/* Thin circles behind the card */
 .login-container::before,
 .login-container::after {
     content: "";
@@ -70,7 +62,6 @@ body {
     height: 1000px;
 }
 
-/* Main Card */
 .login-box {
     position: relative;
     z-index: 1;
@@ -83,7 +74,6 @@ body {
     box-shadow: 0 12px 40px rgba(30, 60, 100, 0.18);
 }
 
-/* Small icon box at the top of the card */
 .card-icon {
     width: 52px;
     height: 52px;
@@ -113,14 +103,12 @@ body {
     color: #6b7280;
 }
 
-/* Error / success messages (the PHP still creates them) */
 .login-box .alert {
     padding: 10px 14px;
     font-size: 13px;
     border-radius: 10px;
 }
 
-/* Input Fields */
 .form-group {
     margin-bottom: 12px;
 }
@@ -159,7 +147,6 @@ body {
     border-color: #0d6efd;
 }
 
-/* Password Icon (show / hide) */
 .toggle-password {
     position: absolute;
     top: 50%;
@@ -177,7 +164,6 @@ body {
     color: #111827;
 }
 
-/* Forgot password link */
 .forgot-link {
     margin: -4px 0 14px;
     text-align: right;
@@ -188,7 +174,6 @@ body {
     color: #111827;
 }
 
-/* Buttons */
 .login-button {
     width: 100%;
     height: 44px;
@@ -206,7 +191,6 @@ body {
     background: linear-gradient(180deg, #4a4f58 0%, #1f2329 100%);
 }
 
-/* Link under the button (Register / Login) */
 .switch-text {
     margin: 22px 0 0;
     padding-top: 16px;
@@ -221,7 +205,6 @@ body {
     font-weight: bold;
 }
 
-/* Responsive Design */
 @media (max-width: 576px) {
     .logo {
         top: 14px;

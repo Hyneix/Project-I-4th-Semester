@@ -61,12 +61,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-    <!-- Design for this page (shared by login.php and register.php) -->
     <link href="auth.css" rel="stylesheet">
 </head>
 <body>
 
-<!-- Logo: replace images/logo.png to change it -->
 <a href="index.php" class="logo">
     <img src="images/logo.png" alt="Room Booking System">
     <span>Room Booking System</span>
@@ -82,14 +80,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <h1>Create your account</h1>
         <p class="subtitle">Register to book rooms quickly and easily.</p>
 
-        <!-- Display error message -->
         <?php if ($message != "") { ?>
             <div class="alert alert-danger">
                 <?php echo $message; ?>
             </div>
         <?php } ?>
 
-        <!-- Registration Form -->
         <form method="POST" action="register.php" onsubmit="return validateForm()">
 
             <div class="form-group">
@@ -214,7 +210,6 @@ function validateForm() {
     return true;
 }
 
-/* Show / hide password: changes the input type and the eye icon */
 function togglePassword(inputId, button) {
     var input = document.getElementById(inputId);
     var icon = button.querySelector("i");

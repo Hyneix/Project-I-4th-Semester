@@ -1,28 +1,28 @@
 <?php $base = isset($base) ? $base : ""; // "" on user pages, "../" on admin pages ?>
-<!-- Footer.php - reusable site footer (plain HTML, no PHP needed)
-     Use at the bottom of every page:  include "Footer.php";  -->
 
-<!-- Bootstrap Icons (used only for the small contact icons) -->
 <link rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
-/* ============================================================
-   SIMPLE FOOTER - dark gray background, light text
-   ============================================================ */
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
 .site-footer {
     background-color: #222222;
     color: #cccccc;
-    margin-top: 50px;
+    margin-top: auto;   
     font-family: Arial, sans-serif;
 }
 
-/* Top part: 3 columns */
 .footer-main {
     width: 90%;
     max-width: 1200px;
     margin: auto;
-    padding: 35px 0 20px 0;
+    padding: 85px 0 20px 0;   
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 25px;
@@ -46,7 +46,6 @@
     margin-bottom: 8px;
 }
 
-/* Footer links */
 .footer-links a {
     display: block;
     color: #cccccc;
@@ -60,7 +59,6 @@
     text-decoration: underline;
 }
 
-/* Bottom copyright bar */
 .footer-bottom {
     border-top: 1px solid #444444;
     text-align: center;
@@ -69,7 +67,6 @@
     color: #999999;
 }
 
-/* Small screens: stack the columns */
 @media (max-width: 700px) {
     .footer-main {
         grid-template-columns: 1fr;
@@ -78,18 +75,15 @@
 }
 </style>
 
-<!-- ===================== FOOTER ===================== -->
 <footer class="site-footer">
 
     <div class="footer-main">
 
-        <!-- 1. Website name + short description -->
-        <div>
+]        <div>
             <h5>Room Booking System</h5>
             <p>Find and book suitable rooms easily.</p>
         </div>
 
-        <!-- 2. Quick links (same links as the header) -->
         <div class="footer-links">
             <h6>Quick Links</h6>
             <a href="<?php echo $base; ?>index.php">Home</a>
@@ -99,7 +93,6 @@
             <a href="<?php echo $base; ?>ContactUs.php">Contact Us</a>
         </div>
 
-        <!-- 3. Contact -->
         <div>
             <h6>Contact</h6>
             <p><i class="bi bi-envelope"></i> support@roombooking.com</p>
@@ -109,7 +102,6 @@
 
     </div>
 
-    <!-- Copyright bar -->
     <div class="footer-bottom">
         &copy; 2026 Room Booking System. All rights reserved.
     </div>

@@ -1,6 +1,5 @@
 <?php
-// Put at the top of every admin page: checks login, then prints the menu.
-// ob_start() lets pages use header("Location: ...") after including this file.
+
 ob_start();
 session_start();
 
@@ -12,7 +11,6 @@ if (!isset($_SESSION['admin_id'])) {
 
 include "../dbconnection.php";
 
-// Get the admin's current role from the database
 $admin_id = (int) $_SESSION['admin_id'];
 $sql = "SELECT admins.role_id, admin_roles.role_name
         FROM admins
@@ -21,7 +19,6 @@ $sql = "SELECT admins.role_id, admin_roles.role_name
 $result = mysqli_query($conn, $sql);
 $admin = mysqli_fetch_assoc($result);
 
-// Admin account was deleted -> log out
 if (!$admin) {
     unset($_SESSION['admin_id']);
     unset($_SESSION['admin_name']);
@@ -33,7 +30,6 @@ if (!$admin) {
 $_SESSION['role_id'] = $admin['role_id'];
 $is_super_admin = ($admin['role_name'] == 'Super Admin');
 
-// Current page (for the active menu link) and first letter of the admin's name
 $current_page = basename($_SERVER['PHP_SELF']);
 $first_letter = mb_strtoupper(mb_substr($_SESSION['admin_name'], 0, 1));
 ?>

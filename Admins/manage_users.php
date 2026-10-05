@@ -13,7 +13,6 @@ if (isset($_POST['delete_user'])) {
     exit();
 }
 
-// Get all users (password is NOT selected)
 $users = mysqli_query($conn, "SELECT user_id, full_name, email, phone, created_at
                               FROM users
                               ORDER BY user_id");
@@ -62,7 +61,7 @@ $users = mysqli_query($conn, "SELECT user_id, full_name, email, phone, created_a
     </table>
 </div>
 
-</div><!-- end .page-content -->
+</div>
 
 <?php $base = "../"; include "../Footer.php"; ?>
 </body>

@@ -2,7 +2,6 @@
 session_start();
 include "dbconnection.php";
 
-// Already logged in? No need to see the login form again
 if (isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit();
@@ -31,14 +30,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $row = $result->fetch_assoc();
 
             if (password_verify($password, $row['password'])) {
-                // New session id after login (stops session fixation)
                 session_regenerate_id(true);
 
                 $_SESSION['user_id'] = $row['user_id'];
                 $_SESSION['full_name'] = $row['full_name'];
                 $_SESSION['email'] = $row['email'];
 
-                // Go back to the page the user came from (set by Booking.php / my_bookings.php)
                 $go = $_SESSION['after_login'] ?? "index.php";
                 unset($_SESSION['after_login']);
 
@@ -65,12 +62,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-    <!-- Design for this page (shared by login.php and register.php) -->
     <link href="auth.css" rel="stylesheet">
 </head>
 <body>
 
-<!-- Logo: replace images/logo.png to change it -->
 <a href="index.php" class="logo">
     <img src="images/logo.png" alt="Room Booking System">
     <span>Room Booking System</span>
@@ -150,7 +145,6 @@ function validateForm() {
     return true;
 }
 
-/* Show / hide password: changes the input type and the eye icon */
 function togglePassword(inputId, button) {
     var input = document.getElementById(inputId);
     var icon = button.querySelector("i");

@@ -1,15 +1,10 @@
-<?php $base = isset($base) ? $base : ""; // "" on user pages, "../" on admin pages ?>
-<!-- Footer.php - reusable site footer (plain HTML, no PHP needed)
-     Use at the bottom of every page:  include "Footer.php";  -->
+<?php $base = isset($base) ? $base : "";  ?>
 
-<!-- Bootstrap Icons (used only for the small contact icons) -->
 <link rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
-/* ============================================================
-   SIMPLE FOOTER - dark gray background, light text
-   ============================================================ */
+
 .site-footer {
     background-color: #222222;
     color: #cccccc;
@@ -17,7 +12,6 @@
     font-family: Arial, sans-serif;
 }
 
-/* Top part: 3 columns */
 .footer-main {
     width: 90%;
     max-width: 1200px;
@@ -46,7 +40,9 @@
     margin-bottom: 8px;
 }
 
-/* Footer links */
+
+
+
 .footer-links a {
     display: block;
     color: #cccccc;
@@ -60,7 +56,6 @@
     text-decoration: underline;
 }
 
-/* Bottom copyright bar */
 .footer-bottom {
     border-top: 1px solid #444444;
     text-align: center;
@@ -69,13 +64,11 @@
     color: #999999;
 }
 
-/* Dark mode: footer stays dark */
 body.dark-mode .site-footer {
     background-color: #111111;
     color: #adb5bd;
 }
 
-/* Small screens: stack the columns */
 @media (max-width: 700px) {
     .footer-main {
         grid-template-columns: 1fr;
@@ -84,18 +77,15 @@ body.dark-mode .site-footer {
 }
 </style>
 
-<!-- ===================== FOOTER ===================== -->
 <footer class="site-footer">
 
     <div class="footer-main">
 
-        <!-- 1. Website name + short description -->
         <div>
             <h5>Room Booking System</h5>
             <p>Find and book suitable rooms easily.</p>
         </div>
 
-        <!-- 2. Quick links (same links as the header) -->
         <div class="footer-links">
             <h6>Quick Links</h6>
             <a href="<?php echo $base; ?>index.php">Home</a>
@@ -104,7 +94,6 @@ body.dark-mode .site-footer {
             <a href="<?php echo $base; ?>UserProfile.php">Profile</a>
         </div>
 
-        <!-- 3. Contact -->
         <div>
             <h6>Contact</h6>
             <p><i class="bi bi-envelope"></i> support@roombooking.com</p>
@@ -114,7 +103,6 @@ body.dark-mode .site-footer {
 
     </div>
 
-    <!-- Copyright bar -->
     <div class="footer-bottom">
         &copy; 2026 Room Booking System. All rights reserved.
     </div>

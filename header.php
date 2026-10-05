@@ -3,27 +3,22 @@
 //     session_start();
 // }
 
-// Name of the page that is open now (example: "userprofile.php")
 $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
 ?>
 
 <style>
-/* ============================================================
-   SIMPLE FLEXBOX HEADER
-   Logo -> LEFT | Navigation -> MIDDLE | User -> RIGHT
-   ============================================================ */
+
 .site-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;                  /* wraps on small screens */
+    flex-wrap: wrap;                  
     gap: 10px;
     padding: 12px 25px;
     background: #fff;
     border-bottom: 1px solid #e5e5e5;
 }
 
-/* ---------- LEFT: logo ---------- */
 .left-section {
     display: flex;
     align-items: center;
@@ -33,7 +28,6 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
     height: 35px;
 }
 
-/* ---------- MIDDLE: navigation links ---------- */
 .nav-section {
     display: flex;
     align-items: center;
@@ -48,21 +42,18 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
     color: #333;
 }
 
-/* Hover and active page: dark background, white text */
 .nav-section a:hover,
 .nav-section a.active {
     background-color: #333;
     color: white;
 }
 
-/* ---------- RIGHT: user avatar / login buttons ---------- */
 .right-section {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-/* Login / Register / Logout buttons */
 .btn-header {
     padding: 7px 14px;
     border-radius: 5px;
@@ -70,7 +61,6 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
     font-size: 14px;
 }
 
-/* White button with dark border (Login, Logout) */
 .btn-header-outline {
     border: 1px solid #333;
     color: #333;
@@ -82,7 +72,6 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
     color: #fff;
 }
 
-/* Dark button (Register) */
 .btn-header-dark {
     border: 1px solid #333;
     color: #fff;
@@ -94,7 +83,6 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
     border-color: #555;
 }
 
-/* Round user icon that shows the first letter of the name */
 .user-icon {
     width: 35px;
     height: 35px;
@@ -108,14 +96,13 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
     justify-content: center;
 }
 
-/* ---------- Small screens: navigation goes under the logo row ---------- */
 @media (max-width: 768px) {
     .site-header {
         padding: 10px 15px;
     }
 
     .nav-section {
-        order: 3;                     /* move below logo and right section */
+        order: 3;                     
         width: 100%;
         justify-content: center;
     }
@@ -123,11 +110,9 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
 
 </style>
 
-<!-- Simple flexbox header:
-     LEFT = logo | MIDDLE = navigation | RIGHT = user -->
+
 <header class="site-header">
 
-    <!-- LEFT SECTION: logo -->
     <div class="left-section">
 
         <div class="logo">
@@ -138,7 +123,6 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
 
     </div>
 
-    <!-- MIDDLE SECTION: navigation links (active page is highlighted) -->
     <nav class="nav-section">
 
         <a href="index.php"
@@ -156,35 +140,33 @@ $currentPage = strtolower(basename($_SERVER['PHP_SELF']));
            Bookings
         </a>
 
-        <a href="UserProfile.php"
-           class="<?php echo $currentPage == 'userprofile.php' ? 'active' : ''; ?>">
-           Profile
-        </a>
-
         <a href="ContactUs.php"
            class="<?php echo $currentPage == 'contactus.php' ? 'active' : ''; ?>">
            Contact Us
         </a>
 
+        <a href="UserProfile.php"
+           class="<?php echo $currentPage == 'userprofile.php' ? 'active' : ''; ?>">
+           Profile
+        </a>
+
+        
+
     </nav>
 
-    <!-- RIGHT SECTION: user avatar / login buttons -->
     <div class="right-section">
 
         <?php if (isset($_SESSION['user_id'])): ?>
 
             <?php
-            // First letter of the logged-in user's name
-            // (set in login.php: $_SESSION['full_name'])
+            
             $firstLetter = mb_strtoupper(mb_substr($_SESSION['full_name'], 0, 1));
             ?>
 
-            <!-- User avatar (replaces "Hi, <name>") -->
             <div class="user-icon">
                 <?php echo htmlspecialchars($firstLetter); ?>
             </div>
 
-            <!-- Logout is shown ONLY on the profile page -->
             <?php if ($currentPage == 'userprofile.php'): ?>
                 <a href="logout.php" class="btn-header btn-header-outline">
                     Logout

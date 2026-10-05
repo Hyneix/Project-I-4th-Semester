@@ -1,5 +1,4 @@
-/* admin.css - one stylesheet for all admin pages.
-   Colours, fonts, header and buttons match the user side (header.php). */
+
 
 body {
     font-family: Arial, sans-serif;
@@ -10,7 +9,6 @@ body {
     flex-direction: column;
 }
 
-/* footer stays at the bottom of short pages */
 body > .site-footer {
     margin-top: auto;
 }
@@ -83,7 +81,6 @@ body > .site-footer {
     .nav-section { order: 3; width: 100%; justify-content: center; flex-wrap: wrap; }
 }
 
-/* ---------- Page layout ---------- */
 .page-content {
     margin: 30px auto 50px;
 }
@@ -115,7 +112,6 @@ body > .site-footer {
     margin: 0;
 }
 
-/* ---------- White boxes (cards and tables share one style) ---------- */
 .box,
 .summary-card,
 .table-box,
@@ -139,7 +135,6 @@ body > .site-footer {
 .table-box th { background: #f0f0f0; font-size: 14px; white-space: nowrap; }
 .table-box td { font-size: 14px; }
 
-/* ---------- Status labels (black, white, gray) ---------- */
 .status-badge {
     display: inline-block;
     padding: 3px 10px;
@@ -155,7 +150,6 @@ body > .site-footer {
 .status-cancelled,
 .status-maintenance { background: #fff; color: #777; border: 1px solid #ccc; }
 
-/* ---------- Buttons and forms ---------- */
 .btn-dark {
     --bs-btn-bg: #333;
     --bs-btn-border-color: #333;
@@ -182,10 +176,8 @@ body > .site-footer {
 
 .form-label { font-size: 14px; font-weight: bold; }
 
-/* login / register box */
 .auth-box { max-width: 440px; margin: 50px auto; }
 
-/* ---------- Room cards (manage_rooms.php) ---------- */
 .admin-room-card { overflow: hidden; height: 100%; }
 .admin-room-img { position: relative; }
 
@@ -230,7 +222,6 @@ body > .site-footer {
     border-top: 1px solid #eee;
 }
 
-/* ---------- Recent messages on the dashboard ---------- */
 .message-row {
     display: block;
     padding: 12px 8px;
